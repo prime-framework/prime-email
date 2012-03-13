@@ -1,0 +1,28 @@
+<project xmlns="http://www.inversoft.org/schemas/savant-2.0/project"
+         name="prime-email"
+         group="primeframework.org"
+         version="1.0.3">
+
+  <plugin group="plugins.savant.inversoft.org" name="ide" version="1.2"/>
+  <plugin group="plugins.savant.inversoft.org" name="clean" version="1.1.1"/>
+  <plugin group="plugins.savant.inversoft.org" name="java" version="1.2"/>
+  <plugin group="plugins.savant.inversoft.org" name="testng" version="1.1.2"/>
+  <plugin group="plugins.savant.inversoft.org" name="release-git" version="1.2"/>
+
+  <!-- compile properties -->
+  <property name="jdk.version" value="1.6"/>
+
+  <dependencies>
+    <artifact-group type="compile-only">
+      <artifact group="mail.javax" project="mail" name="javamail" version="1.4"/>
+    </artifact-group>
+    <artifact-group type="compile">
+      <artifact group="inject.google.com" name="guice" version="3.0"/>
+      <artifact group="freemarker.org" name="freemarker" version="2.3.16"/>
+    </artifact-group>
+    <artifact-group type="test-compile">
+      <artifact group="easymock.org" name="easymock" version="3.1"/>
+      <artifact group="testng.org" name="testng" version="5.11"/>
+    </artifact-group>
+  </dependencies>
+</project>

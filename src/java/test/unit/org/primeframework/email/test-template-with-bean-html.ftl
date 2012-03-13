@@ -1,0 +1,1 @@
+HTML ${bean.name} likes ${bean.bean2.hobby}
