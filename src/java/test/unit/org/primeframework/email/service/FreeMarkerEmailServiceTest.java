@@ -21,11 +21,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.primeframework.email.config.DefaultEmailConfiguration;
+import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import org.testng.annotations.Test;
 
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import static org.testng.Assert.*;
 
@@ -37,8 +38,13 @@ import static org.testng.Assert.*;
 public class FreeMarkerEmailServiceTest {
   @Test
   public void sendEmailClassPath() throws Exception {
+    BeansWrapper wrapper = new BeansWrapper();
+    wrapper.setExposeFields(true);
+    Configuration config = new Configuration();
+    config.setObjectWrapper(wrapper);
+
     MockEmailTransportService transport = new MockEmailTransportService();
-    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, new Configuration(), new DefaultEmailConfiguration(), Locale.US);
+    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, config, new TestEmailConfiguration(), Locale.US);
     service.sendEmail("test-template").
       cc(new EmailAddress("from@example.com")).
       bcc(new EmailAddress("from@example.com")).
@@ -56,8 +62,13 @@ public class FreeMarkerEmailServiceTest {
 
   @Test
   public void sendEmailWebApp() throws Exception {
+    BeansWrapper wrapper = new BeansWrapper();
+    wrapper.setExposeFields(true);
+    Configuration config = new Configuration();
+    config.setObjectWrapper(wrapper);
+
     MockEmailTransportService transport = new MockEmailTransportService();
-    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, new Configuration(), new DefaultEmailConfiguration(), Locale.US);
+    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, config, new TestEmailConfiguration(), Locale.US);
     service.sendEmail("test-template").
       cc(new EmailAddress("from@example.com")).
       bcc(new EmailAddress("from@example.com")).
@@ -80,8 +91,13 @@ public class FreeMarkerEmailServiceTest {
     bean.bean2 = new Bean2();
     bean.bean2.hobby = "fishing";
 
+    BeansWrapper wrapper = new BeansWrapper();
+    wrapper.setExposeFields(true);
+    Configuration config = new Configuration();
+    config.setObjectWrapper(wrapper);
+
     MockEmailTransportService transport = new MockEmailTransportService();
-    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, new Configuration(), new DefaultEmailConfiguration(), Locale.US);
+    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, config, new TestEmailConfiguration(), Locale.US);
     service.sendEmail("test-template-with-bean").
       cc(new EmailAddress("from@example.com")).
       bcc(new EmailAddress("from@example.com")).
@@ -128,6 +144,13 @@ public class FreeMarkerEmailServiceTest {
 
     public void sendEmailLater(Email email) {
       this.email = email;
+    }
+  }
+  
+  public static class TestEmailConfiguration implements EmailConfiguration {
+    @Override
+    public String templateLocation() {
+      return "src/java/test/unit/org/primeframework/email";
     }
   }
 }
