@@ -150,7 +150,7 @@ public class FreeMarkerEmailServiceTest {
   public static class TestEmailConfiguration implements EmailConfiguration {
     @Override
     public String templateLocation() {
-      return "src/java/test/unit/org/primeframework/email";
+      return "src/test/java/org/primeframework/email";
     }
   }
 }
