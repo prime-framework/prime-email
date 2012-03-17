@@ -108,6 +108,7 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" name="groovy-1.8" level="application" />
   </component>
   <component name="copyright">
     <Base>
