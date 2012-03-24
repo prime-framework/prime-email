@@ -1,6 +1,6 @@
 // Project info
 group = "org.primeframework"
-version = "1.0"
+version = "0.1"
 description = "Prime Email Framework"
 
 apply plugin: 'java'
