@@ -6,6 +6,7 @@ description = "Prime Email Framework"
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'integration'
+apply plugin: "release"
 
 // Build script config
 buildscript {
@@ -16,7 +17,9 @@ buildscript {
   }
   dependencies {
     classpath(
-      "org.primeframework.gradle:gradle-integration-plugin:0.1"
+      "org.primeframework.gradle:gradle-integration-plugin:0.1",
+      "org.primeframework.gradle:gradle-ide-plugin:0.1",
+      "org.primeframework.gradle:gradle-release-plugin:0.2"
     )
   }
 }
