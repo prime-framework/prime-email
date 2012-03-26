@@ -74,7 +74,6 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    * @param executorService The executor service for asynchronous sending.
    */
   @Inject
-  @SuppressWarnings({"unchecked"})
   public JavaMailEmailTransportService(Session session, @org.primeframework.email.guice.Email ExecutorService executorService) {
     this.session = session;
     this.executorService = executorService;
