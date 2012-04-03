@@ -1,11 +1,11 @@
 // Project info
 group = "org.primeframework"
-version = "0.2"
+version = "0.3"
 description = "Prime Email Framework"
 
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'integration'
+apply plugin: "java"
+apply plugin: "idea"
+apply plugin: "init"
 apply plugin: "release"
 
 // Build script config
@@ -21,15 +21,11 @@ buildscript {
     }
   }
   dependencies {
-    classpath(
-      "org.primeframework.gradle:gradle-integration-plugin:0.1",
-      "org.primeframework.gradle:gradle-ide-plugin:0.1",
-      "org.primeframework.gradle:gradle-release-plugin:0.2"
-    )
+    classpath "org.primeframework.gradle:gradle-init-plugin:0.1",
+      "org.primeframework.gradle:gradle-release-plugin:0.5"
   }
 }
 
-// Deps
 repositories {
   mavenCentral()
 }
