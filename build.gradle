@@ -21,8 +21,8 @@ buildscript {
     }
   }
   dependencies {
-    classpath "org.primeframework.gradle:gradle-init-plugin:0.1",
-      "org.primeframework.gradle:gradle-release-plugin:0.5"
+    classpath "org.primeframework.gradle:gradle-init-plugin:0.2",
+      "org.primeframework.gradle:gradle-release-plugin:0.6"
   }
 }
 
@@ -54,7 +54,3 @@ sourceCompatibility = 1.6
 test {
   useTestNG()
 }
-
-// for compliation so that the debug level is set
-project.compileJava.options.debugOptions.debugLevel = "source,lines,vars"
-project.compileTestJava.options.debugOptions.debugLevel = "source,lines,vars"
