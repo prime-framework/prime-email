@@ -68,6 +68,9 @@
     <option name="OPEN_IN_BROWSER" value="false" />
     <option name="OUTPUT_DIRECTORY" />
   </component>
+  <component name="GradleSettings">
+    <option name="gradleHome" value="$GRADLE_HOME$" />
+  </component>
   <component name="IdProvider" IDEtalkID="C3E10093AD37246DAE72198F2F6CDB7D" />
   <component name="InspectionProjectProfileManager">
     <profiles>
