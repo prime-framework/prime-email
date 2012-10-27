@@ -33,13 +33,13 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.primeframework.email.EmailException;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -189,7 +189,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    * The callable for handling async message sending.
    */
   public static class EmailRunnable implements Runnable {
-    private static final Logger logger = Logger.getLogger(EmailRunnable.class.getName());
+    private final static Logger logger = LoggerFactory.getLogger(EmailRunnable.class);
     private Message message;
     private Session session;
 
@@ -200,17 +200,17 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
     public void run() {
       try {
-        logger.fine("Sending mail to JavaMail API");
+        logger.debug("Sending mail to JavaMail API");
 
         Transport transport = session.getTransport();
         transport.connect();
         transport.sendMessage(message, message.getAllRecipients());
         transport.close();
 
-        logger.fine("Finished JavaMail send");
+        logger.debug("Finished JavaMail send");
       } catch (MessagingException e) {
-        logger.log(Level.SEVERE, "Unable to send email via JavaMail", e);
-        throw new org.primeframework.email.EmailException("Unable to send email via JavaMail", e);
+        logger.error("Unable to send email via JavaMail", e);
+        throw new EmailException("Unable to send email via JavaMail", e);
       }
     }
   }

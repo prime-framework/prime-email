@@ -20,12 +20,12 @@ import java.io.StringWriter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.primeframework.email.EmailException;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.Email;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import freemarker.template.Configuration;
@@ -57,7 +57,7 @@ import freemarker.template.Template;
  * @author Brian Pontarelli
  */
 public class FreeMarkerEmailService implements EmailService {
-  private static final Logger logger = Logger.getLogger(FreeMarkerEmailService.class.getName());
+  private final static Logger logger = LoggerFactory.getLogger(FreeMarkerEmailService.class);
   private final EmailTransportService emailTransportService;
   private final freemarker.template.Configuration freeMarkerConfiguration;
   private final Locale locale;
@@ -151,8 +151,8 @@ public class FreeMarkerEmailService implements EmailService {
    * @throws EmailException If the template couldn't be processed.
    */
   protected String callTemplate(String templateName, Map<String, Object> parameters) {
-    if (logger.isLoggable(Level.FINEST)) {
-      logger.finest("Invoking FreeMarker email template [" + templateName + "] with parameters " + parameters);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Invoking FreeMarker email template [" + templateName + "] with parameters " + parameters);
     }
 
     StringWriter writer = new StringWriter();
