@@ -15,14 +15,11 @@
  */
 package org.primeframework.email.config;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * Configuration for the email system.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(DefaultEmailConfiguration.class)
 public interface EmailConfiguration {
   /**
    * @return The location of the email templates

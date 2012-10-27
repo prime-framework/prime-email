@@ -118,11 +118,11 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/org.testng/testng/6.4/jar/780e5804ff5e2bcfa262c02ca9401456f682bbc5/testng-6.4.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/org.testng/testng/6.8/jar/ad4531b28715d39f73c49a56caf0c456cb34d48c/testng-6.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/org.testng/testng/6.4/source/ea3723f91d96f9a876749d86406ff5cf2fb948b7/testng-6.4-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/org.testng/testng/6.8/source/8895c842d25756b59e252823f697b263c12de7ce/testng-6.8-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -147,7 +147,18 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/junit/junit/3.8.1/jar/99129f16442844f6a4a11ae22fbbee40b14d774f/junit-3.8.1.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/org.hamcrest/hamcrest-core/1.1/jar/860340562250678d1a344907ac75754e259cdb14/hamcrest-core-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/org.hamcrest/hamcrest-core/1.1/source/2ccf1154d1a8936042a8a742dc3e611d02ac7213/hamcrest-core-1.1-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/junit/junit/4.10/jar/e4f1766ce7404a08f45d859fb9c226fc9e41a861/junit-4.10.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -165,7 +176,7 @@
     <orderEntry type="module-library" scope="TEST">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.beust/jcommander/1.12/jar/7409692b48022f9eca7445861defbcdb9ee3c2a8/jcommander-1.12.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-14/filestore/com.beust/jcommander/1.27/jar/58c9cbf0f1fa296f93c712f2cf46de50471920f9/jcommander-1.27.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

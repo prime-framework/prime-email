@@ -13,22 +13,21 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.email.guice;
+package org.primeframework.email.config.guice;
 
-import org.primeframework.email.config.guice.ConfigurationModule;
-import org.primeframework.email.service.guice.ServiceModule;
+import org.primeframework.email.config.DefaultEmailConfiguration;
+import org.primeframework.email.config.EmailConfiguration;
 
 import com.google.inject.AbstractModule;
 
 /**
- * Virtual module that binds the {@link ConfigurationModule} and the {@link ServiceModule}.
+ * Binds the email configuration.
  *
  * @author Brian Pontarelli
  */
-public class EmailModule extends AbstractModule {
+public class ConfigurationModule extends AbstractModule {
   @Override
   protected void configure() {
-    install(new ConfigurationModule());
-    install(new ServiceModule());
+    bind(EmailConfiguration.class).to(DefaultEmailConfiguration.class);
   }
 }

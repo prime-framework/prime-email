@@ -17,14 +17,11 @@ package org.primeframework.email.service;
 
 import org.primeframework.email.EmailException;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines how to send emails in a simple and templatized manner.
  *
  * @author Brian Pontarelli and James Humphrey
  */
-@ImplementedBy(FreeMarkerEmailService.class)
 public interface EmailService {
   /**
    * Called to build the email using the specified template as the email body, configure the email using the returned

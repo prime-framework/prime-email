@@ -19,14 +19,11 @@ import java.util.concurrent.Future;
 
 import org.primeframework.email.domain.Email;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * This interface defines the transport mechanism for sending email messages.
  *
  * @author Brian Pontarelli
  */
-@ImplementedBy(JavaMailEmailTransportService.class)
 public interface EmailTransportService {
   /**
    * Sends an email using some SMTP transport mechanism. An implementation might decide to make the sending be
