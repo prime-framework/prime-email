@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -36,6 +38,9 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportServiceTest {
+
+  private final static Logger logger = LoggerFactory.getLogger(JavaMailEmailTransportServiceTest.class);
+
   private static Session session;
 
   @BeforeClass
@@ -53,7 +58,7 @@ public class JavaMailEmailTransportServiceTest {
   }
 
   @Test
-  public void sendEmail() throws Exception {
+  public void sendEmail() {
     JavaMailEmailTransportService service = new JavaMailEmailTransportService(session, new ThreadPoolExecutor(1, 1, 500, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(10)));
     Email email = new Email();
     email.from = new EmailAddress("james@inversoft.com");
@@ -61,9 +66,15 @@ public class JavaMailEmailTransportServiceTest {
     email.subject = "Test email";
     email.text = "text";
     email.html = "<html><body><h3>html</h3></body></html>";
-    Future<Email> future = service.sendEmail(email);
-    assertNotNull(future);
-    future.get();
+
+    try {
+      Future<Email> future = service.sendEmail(email);
+      assertNotNull(future);
+      future.get();
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Unable to send emails.  Are you running a SMTP server?  Try executing: sudo postfix start");
+    }
   }
 
   @Test
@@ -76,8 +87,13 @@ public class JavaMailEmailTransportServiceTest {
     email.text = "text";
     email.html = "<html><body><h3>html</h3></body></html>";
     email.attachments.add(new Attachment("test.txt", "text/plain", "Hello world".getBytes()));
-    Future<Email> future = service.sendEmail(email);
-    assertNotNull(future);
-    future.get();
+
+    try {
+      Future<Email> future = service.sendEmail(email);
+      assertNotNull(future);
+      future.get();
+    } catch (Exception e) {
+      fail("Unable to send emails.  Are you running a SMTP server?  Try executing: sudo postfix start");
+    }
   }
 }
