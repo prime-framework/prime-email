@@ -27,7 +27,11 @@
       <entry name="?*.dtd" />
       <entry name="?*.tld" />
     </wildcardResourcePatterns>
-    <annotationProcessing enabled="false" useClasspath="true" />
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+    </annotationProcessing>
   </component>
   <component name="CopyrightManager" default="Inversoft Apache">
     <copyright>
@@ -37,7 +41,6 @@
       <option name="myName" value="Inversoft Apache" />
       <option name="myLocal" value="true" />
     </copyright>
-    <module2copyright />
     <LanguageOptions name="__TEMPLATE__">
       <option name="addBlankAfter" value="false" />
     </LanguageOptions>
@@ -67,9 +70,6 @@
     <option name="PRINT_LINE_NUMBERS" value="false" />
     <option name="OPEN_IN_BROWSER" value="false" />
     <option name="OUTPUT_DIRECTORY" />
-  </component>
-  <component name="GradleSettings">
-    <option name="gradleHome" value="$GRADLE_HOME$" />
   </component>
   <component name="IdProvider" IDEtalkID="C3E10093AD37246DAE72198F2F6CDB7D" />
   <component name="InspectionProjectProfileManager">

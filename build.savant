@@ -1,0 +1,86 @@
+/*
+ * Copyright (c) 2014, Inversoft Inc., All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
+ */
+project(group: "org.primeframework", name: "prime-email", version: "0.10", licenses: ["ApacheV2_0"]) {
+  workflow {
+    standard()
+  }
+
+  dependencies {
+    group(name: "provided") {
+      dependency(id: "javax.mail:mail:1.4.4")
+    }
+    group(name: "compile") {
+      dependency(id: "com.google.inject:guice:4.0.0-beta.4")
+      dependency(id: "javax.inject:javax.inject:1.0.0")
+      dependency(id: "org.apache.commons:commons-fileupload:1.2.1")
+      dependency(id: "org.apache.commons:commons-io:2.1.0")
+      dependency(id: "org.freemarker:freemarker:2.3.19")
+      dependency(id: "org.slf4j:slf4j-api:1.7.7")
+    }
+    group(name: "test-compile", export: false) {
+      dependency(id: "org.easymock:easymock:3.2.0")
+      dependency(id: "org.testng:testng:6.8.7")
+    }
+  }
+
+  publications {
+    standard()
+  }
+}
+
+// Plugins
+file = loadPlugin(id: "org.savantbuild.plugin:file:0.2.0-{integration}")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.2.0-{integration}")
+java = loadPlugin(id: "org.savantbuild.plugin:java:0.2.0-{integration}")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.2.0-{integration}")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.2.0-{integration}")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.2.0-{integration}")
+
+// Plugin settings
+java.settings.javaVersion = "1.6"
+javaTestNG.settings.javaVersion = "1.6"
+
+target(name: "clean", description: "Cleans the project") {
+  java.clean()
+}
+
+target(name: "compile", description: "Compiles the project") {
+  java.compile()
+}
+
+target(name: "jar", description: "JARs the project", dependsOn: ["compile"]) {
+  java.jar()
+}
+
+target(name: "test", description: "Runs the project's tests", dependsOn: ["jar"]) {
+  javaTestNG.test()
+}
+
+target(name: "doc", description: "Generate the project's JavaDoc", dependsOn: ["jar"]) {
+  java.document()
+}
+
+target(name: "int", description: "Releases a local integration build of the project", dependsOn: ["test"]) {
+  dependency.integrate()
+}
+
+target(name: "release", description: "Releases a full version of the project", dependsOn: ["test"]) {
+  release.release()
+}
+
+target(name: "idea", description: "Updates the IntelliJ IDEA module file") {
+  idea.iml()
+}
