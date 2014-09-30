@@ -13,9 +13,15 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-project(group: "org.primeframework", name: "prime-email", version: "0.10", licenses: ["ApacheV2_0"]) {
+savantVersion = "0.2.0"
+
+project(group: "org.primeframework", name: "prime-email", version: "0.10.0", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
+  }
+
+  publishWorkflow {
+    subversion(repository: "http://svn.inversoft.org/savant")
   }
 
   dependencies {
@@ -42,12 +48,12 @@ project(group: "org.primeframework", name: "prime-email", version: "0.10", licen
 }
 
 // Plugins
-file = loadPlugin(id: "org.savantbuild.plugin:file:0.2.0-{integration}")
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:0.2.0-{integration}")
-java = loadPlugin(id: "org.savantbuild.plugin:java:0.2.0-{integration}")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:0.2.0-{integration}")
-idea = loadPlugin(id: "org.savantbuild.plugin:idea:0.2.0-{integration}")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:0.2.0-{integration}")
+file = loadPlugin(id: "org.savantbuild.plugin:file:${savantVersion}")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:${savantVersion}")
+java = loadPlugin(id: "org.savantbuild.plugin:java:${savantVersion}")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:${savantVersion}")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:${savantVersion}")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 
 // Plugin settings
 java.settings.javaVersion = "1.6"
