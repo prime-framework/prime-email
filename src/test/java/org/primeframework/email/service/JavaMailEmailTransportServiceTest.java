@@ -17,20 +17,15 @@ package org.primeframework.email.service;
 
 import javax.mail.Session;
 import java.util.Properties;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
 
 /**
  * This class tests the JavaMailEmailTransportService.
@@ -38,9 +33,6 @@ import static org.testng.Assert.*;
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportServiceTest {
-
-  private final static Logger logger = LoggerFactory.getLogger(JavaMailEmailTransportServiceTest.class);
-
   private static Session session;
 
   @BeforeClass
@@ -59,7 +51,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmail() {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(session, new ThreadPoolExecutor(1, 1, 500, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(10)));
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(session);
     Email email = new Email();
     email.from = new EmailAddress("james@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
@@ -79,7 +71,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmailWithAttachments() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(session, new ThreadPoolExecutor(1, 1, 500, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(10)));
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(session);
     Email email = new Email();
     email.from = new EmailAddress("brian@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));

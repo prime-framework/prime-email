@@ -15,6 +15,9 @@
  */
 package org.primeframework.email.service;
 
+import java.util.List;
+import java.util.Locale;
+
 import org.primeframework.email.EmailException;
 
 /**
@@ -25,27 +28,28 @@ import org.primeframework.email.EmailException;
 public interface EmailService {
   /**
    * Called to build the email using the specified template as the email body, configure the email using the returned
-   * {@link EmailCommand} object and then send the email using the returned {@link EmailCommand} object.
-   * <p/>
+   * {@link EmailBuilder} object and then send the email.
+   * <p>
    * Here's an example using the template below named 'hello':
-   * <p/>
+   * <p>
    * <pre>
    * Hello ${name},
    *
    * Thanks for buying all that cool stuff.
    * </pre>
-   * <p/>
+   * <p>
    * You would call this method like this:
-   * <p/>
+   * <p>
    * <pre>
    * sendEmail("hello").withTemplateParam("name", "Joe Blow").to("joe@blow.com").from("info@example.com").now();
    * </pre>
    *
-   * @param template (Required) The name of the template. The implementation will dictate the type of template and how
-   *                 they are stored.
-   * @return The name value pair chain.
+   * @param templateId         (Required) The id of the template. The implementation will dictate the type of template
+   *                           and how they are stored.
+   * @param preferredLanguages The preferred languages to send them email in.
+   * @return The email building that is used to build up the email configuration and parameters.
    * @throws EmailException Runtime exception thrown if the from and/or subject are null and also if the email message
    *                        contains zero recipients
    */
-  EmailCommand sendEmail(String template) throws EmailException;
+  EmailBuilder sendEmail(Object templateId, List<Locale> preferredLanguages) throws EmailException;
 }

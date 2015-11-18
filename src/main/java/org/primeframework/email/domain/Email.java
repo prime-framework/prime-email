@@ -24,13 +24,21 @@ import java.util.List;
  * @author Brian Pontarelli
  */
 public class Email {
-    public String subject;
-    public EmailAddress from;
-    public EmailAddress replyTo;
-    public List<EmailAddress> to = new ArrayList<EmailAddress>();
-    public List<EmailAddress> cc = new ArrayList<EmailAddress>();
-    public List<EmailAddress> bcc = new ArrayList<EmailAddress>();
-    public String text;
-    public String html;
-    public List<Attachment> attachments = new ArrayList<Attachment>();
+  public List<Attachment> attachments = new ArrayList<Attachment>();
+
+  public List<EmailAddress> bcc = new ArrayList<EmailAddress>();
+
+  public List<EmailAddress> cc = new ArrayList<EmailAddress>();
+
+  public EmailAddress from;
+
+  public String html;
+
+  public EmailAddress replyTo;
+
+  public String subject;
+
+  public String text;
+
+  public List<EmailAddress> to = new ArrayList<EmailAddress>();
 }

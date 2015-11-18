@@ -32,62 +32,36 @@ import org.primeframework.email.domain.EmailAddress;
  */
 public interface EmailCommand {
   /**
-   * Adds a single template param for token replacement within the template.
+   * A vararg method to add blind carbon copies.
    *
-   * @param name  the param name
-   * @param value the param value
+   * @param bcc The blind carbon copy email addresses.
    * @return This instance.
    */
-  EmailCommand withTemplateParam(String name, Object value);
+  EmailCommand bcc(EmailAddress... bcc);
 
   /**
-   * Adds template params for token replacement within the template.
+   * A vararg method to add blind carbon copies.
    *
-   * @param params The params to add for token replacement in te template.
+   * @param bcc The blind carbon copy email addresses.
    * @return This instance.
    */
-  EmailCommand withTemplateParams(Map<String, Object> params);
+  EmailCommand bcc(String... bcc);
 
   /**
-   * Returns a map of all the template params.
+   * A vararg method to add email carbon copies.
    *
-   * @return the template param map
-   */
-  Map<String, Object> getTemplateParams();
-
-  /**
-   * Sets the email subject
-   *
-   * @param subject the email subject
+   * @param cc The carbon copy email addresses.
    * @return This instance.
    */
-  EmailCommand withSubject(String subject);
+  EmailCommand cc(EmailAddress... cc);
 
   /**
-   * @return The previous set subject or null.
-   */
-  String getSubject();
-
-  /**
-   * Method to set a list of email to addresses.  This method assumes that the to display is equal to the to address.
+   * A vararg method to add email carbon copies.
    *
-   * @param to The list of to email to send the email to (required).
+   * @param cc The carbon copy email addresses.
    * @return This instance.
    */
-  EmailCommand to(EmailAddress... to);
-
-  /**
-   * Method to set a list of email to addresses.  This method assumes that the to display is equal to the to address.
-   *
-   * @param to The list of to email to send the email to (required).
-   * @return This instance.
-   */
-  EmailCommand to(String... to);
-
-  /**
-   * @return The previously set to addresses or null.
-   */
-  List<EmailAddress> getTo();
+  EmailCommand cc(String... cc);
 
   /**
    * Sets the from email address
@@ -115,9 +89,85 @@ public interface EmailCommand {
   EmailCommand from(String from, String display);
 
   /**
+   * @return The previously set list of attachments.
+   */
+  List<Attachment> getAttachments();
+
+  /**
+   * @return The previously set bcc address or null.
+   */
+  List<EmailAddress> getBcc();
+
+  /**
+   * @return The previously set cc addresses or null.
+   */
+  List<EmailAddress> getCc();
+
+  /**
+   * @return The email that was built.
+   */
+  Email getEmail();
+
+  /**
    * @return The previously set from address or null.
    */
   EmailAddress getFrom();
+
+  /**
+   * @return The params.
+   */
+  Map<String, Object> getParams();
+
+  /**
+   * @return The previously set reply to address or null.
+   */
+  EmailAddress getReplyTo();
+
+  /**
+   * @return The previous set subject or null.
+   */
+  String getSubject();
+
+  /**
+   * @return The template id.
+   */
+  Object getTemplateId();
+
+  /**
+   * Returns a map of all the template params.
+   *
+   * @return the template param map
+   */
+  Map<String, Object> getTemplateParams();
+
+  /**
+   * @return The previously set to addresses or null.
+   */
+  List<EmailAddress> getTo();
+
+  /**
+   * <p> Sends the email sometime in the future. </p> <p/> <p> <strong>NOTE</strong> You must handle the future in order
+   * to ensure correct email handling. In some cases if you don't handle the future, the email will not be sent. If you
+   * don't want to handle the future and want to send the email later, always use the {@link #later()} method. </p>
+   *
+   * @return A Future that represents the sending operation which might have already happened or will happen in the
+   * future, depending on the speed of things.
+   */
+  Future<Email> inTheFuture();
+
+  /**
+   * Sends the email later without waiting for a result or allowing the caller to handle the result.
+   */
+  void later();
+
+  /**
+   * Sends the email right now and waits until it is sent.
+   *
+   * @return The email if it was successfully sent, false if it wasn't sent.
+   * @throws ExecutionException   If the execution of the email send failed.
+   * @throws InterruptedException If the thread used to send the email was interrupted.
+   */
+  Email now() throws ExecutionException, InterruptedException;
 
   /**
    * Sets the reply to email address
@@ -145,51 +195,20 @@ public interface EmailCommand {
   EmailCommand replyTo(String replyTo, String display);
 
   /**
-   * @return The previously set reply to address or null.
-   */
-  EmailAddress getReplyTo();
-
-  /**
-   * A vararg method to add blind carbon copies.
+   * Method to set a list of email to addresses.  This method assumes that the to display is equal to the to address.
    *
-   * @param bcc The blind carbon copy email addresses.
+   * @param to The list of to email to send the email to (required).
    * @return This instance.
    */
-  EmailCommand bcc(EmailAddress... bcc);
+  EmailCommand to(EmailAddress... to);
 
   /**
-   * A vararg method to add blind carbon copies.
+   * Method to set a list of email to addresses.  This method assumes that the to display is equal to the to address.
    *
-   * @param bcc The blind carbon copy email addresses.
+   * @param to The list of to email to send the email to (required).
    * @return This instance.
    */
-  EmailCommand bcc(String... bcc);
-
-  /**
-   * @return The previously set bcc address or null.
-   */
-  List<EmailAddress> getBcc();
-
-  /**
-   * A vararg method to add email carbon copies.
-   *
-   * @param cc The carbon copy email addresses.
-   * @return This instance.
-   */
-  EmailCommand cc(EmailAddress... cc);
-
-  /**
-   * A vararg method to add email carbon copies.
-   *
-   * @param cc The carbon copy email addresses.
-   * @return This instance.
-   */
-  EmailCommand cc(String... cc);
-
-  /**
-   * @return The previously set cc addresses or null.
-   */
-  List<EmailAddress> getCc();
+  EmailCommand to(String... to);
 
   /**
    * Vararg method to add attachments to the email
@@ -200,41 +219,27 @@ public interface EmailCommand {
   EmailCommand withAttachments(Attachment... attachments);
 
   /**
-   * @return The previously set list of attachments.
-   */
-  List<Attachment> getAttachments();
-
-  /**
-   * Sends the email right now and waits until it is sent.
+   * Sets the email subject
    *
-   * @return The email if it was successfully sent, false if it wasn't sent.
-   * @throws ExecutionException   If the execution of the email send failed.
-   * @throws InterruptedException If the thread used to send the email was interrupted.
+   * @param subject the email subject
+   * @return This instance.
    */
-  Email now() throws ExecutionException, InterruptedException;
+  EmailCommand withSubject(String subject);
 
   /**
-   * Sends the email within the next given period of time.
+   * Adds a single template param for token replacement within the template.
    *
-   * @param amount The amount of time.
-   * @return A time command that allows the time parameters to be set.
+   * @param name  the param name
+   * @param value the param value
+   * @return This instance.
    */
-  TimeCommand withinTheNext(long amount);
+  EmailCommand withTemplateParam(String name, Object value);
 
   /**
-   * Sends the email later without waiting for a result or allowing the caller to handle the result.
-   */
-  void later();
-
-  /**
-   * <p> Sends the email sometime in the future. </p>
-   * <p/>
-   * <p> <strong>NOTE</strong> You must handle the future in order to ensure correct email handling. In some cases if
-   * you don't handle the future, the email will not be sent. If you don't want to handle the future and want to send
-   * the email later, always use the {@link #later()} method. </p>
+   * Adds template params for token replacement within the template.
    *
-   * @return A Future that represents the sending operation which might have already happened or will happen in the
-   *         future, depending on the speed of things.
+   * @param params The params to add for token replacement in te template.
+   * @return This instance.
    */
-  Future<Email> inTheFuture();
+  EmailCommand withTemplateParams(Map<String, Object> params);
 }

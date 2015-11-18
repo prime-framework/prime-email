@@ -21,21 +21,21 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.Configuration;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import org.testng.annotations.Test;
-
-import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.Configuration;
-import static org.testng.Assert.*;
+import static java.util.Collections.singletonList;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the FreeMarker email service.
  *
  * @author Brian Pontarelli
  */
-public class FreeMarkerEmailServiceTest {
+public class DefaultEmailServiceTest {
   @Test
   public void sendEmailClassPath() throws Exception {
     BeansWrapper wrapper = new BeansWrapper();
@@ -44,39 +44,15 @@ public class FreeMarkerEmailServiceTest {
     config.setObjectWrapper(wrapper);
 
     MockEmailTransportService transport = new MockEmailTransportService();
-    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, config, new TestEmailConfiguration(), Locale.US);
-    service.sendEmail("test-template").
-      cc(new EmailAddress("from@example.com")).
-      bcc(new EmailAddress("from@example.com")).
-      withSubject("test subject").
-      from(new EmailAddress("from@example.com")).
-      to(new EmailAddress("to@example.com")).
-      withTemplateParam("key1", "value1").
-      now();
-    assertEquals(transport.email.subject, "test subject");
-    assertEquals(transport.email.from.address, "from@example.com");
-    assertEquals(transport.email.to.get(0).address, "to@example.com");
-    assertEquals(transport.email.text, "Text value1");
-    assertEquals(transport.email.html, "HTML value1");
-  }
-
-  @Test
-  public void sendEmailWebApp() throws Exception {
-    BeansWrapper wrapper = new BeansWrapper();
-    wrapper.setExposeFields(true);
-    Configuration config = new Configuration();
-    config.setObjectWrapper(wrapper);
-
-    MockEmailTransportService transport = new MockEmailTransportService();
-    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, config, new TestEmailConfiguration(), Locale.US);
-    service.sendEmail("test-template").
-      cc(new EmailAddress("from@example.com")).
-      bcc(new EmailAddress("from@example.com")).
-      withSubject("test subject").
-      from(new EmailAddress("from@example.com")).
-      to(new EmailAddress("to@example.com")).
-      withTemplateParam("key1", "value1").
-      now();
+    DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
+    service.sendEmail("test-template", singletonList(Locale.US)).
+        cc(new EmailAddress("from@example.com")).
+               bcc(new EmailAddress("from@example.com")).
+               withSubject("test subject").
+               from(new EmailAddress("from@example.com")).
+               to(new EmailAddress("to@example.com")).
+               withTemplateParam("key1", "value1").
+               now();
     assertEquals(transport.email.subject, "test subject");
     assertEquals(transport.email.from.address, "from@example.com");
     assertEquals(transport.email.to.get(0).address, "to@example.com");
@@ -97,15 +73,15 @@ public class FreeMarkerEmailServiceTest {
     config.setObjectWrapper(wrapper);
 
     MockEmailTransportService transport = new MockEmailTransportService();
-    FreeMarkerEmailService service = new FreeMarkerEmailService(transport, config, new TestEmailConfiguration(), Locale.US);
-    service.sendEmail("test-template-with-bean").
-      cc(new EmailAddress("from@example.com")).
-      bcc(new EmailAddress("from@example.com")).
-      withSubject("test subject").
-      from(new EmailAddress("from@example.com")).
-      to(new EmailAddress("to@example.com")).
-      withTemplateParam("bean", bean).
-      now();
+    DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
+    service.sendEmail("test-template-with-bean", singletonList(Locale.US)).
+        cc(new EmailAddress("from@example.com")).
+               bcc(new EmailAddress("from@example.com")).
+               withSubject("test subject").
+               from(new EmailAddress("from@example.com")).
+               to(new EmailAddress("to@example.com")).
+               withTemplateParam("bean", bean).
+               now();
 
     assertEquals(transport.email.subject, "test subject");
     assertEquals(transport.email.from.address, "from@example.com");
@@ -124,20 +100,21 @@ public class FreeMarkerEmailServiceTest {
           return false;
         }
 
+        public Email get() throws InterruptedException, ExecutionException {
+          return null;
+        }
+
+        public Email get(long timeout, TimeUnit unit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+          return null;
+        }
+
         public boolean isCancelled() {
           return false;
         }
 
         public boolean isDone() {
           return false;
-        }
-
-        public Email get() throws InterruptedException, ExecutionException {
-          return null;
-        }
-
-        public Email get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-          return null;
         }
       };
     }
@@ -146,7 +123,7 @@ public class FreeMarkerEmailServiceTest {
       this.email = email;
     }
   }
-  
+
   public static class TestEmailConfiguration implements EmailConfiguration {
     @Override
     public String templateLocation() {

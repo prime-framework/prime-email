@@ -15,20 +15,24 @@
  */
 package org.primeframework.email.guice;
 
-import org.primeframework.email.config.guice.ConfigurationModule;
-import org.primeframework.email.service.guice.ServiceModule;
-
 import com.google.inject.AbstractModule;
+import org.primeframework.email.config.DefaultEmailConfiguration;
+import org.primeframework.email.config.EmailConfiguration;
+import org.primeframework.email.service.DefaultEmailService;
+import org.primeframework.email.service.EmailService;
+import org.primeframework.email.service.EmailTransportService;
+import org.primeframework.email.service.JavaMailEmailTransportService;
 
 /**
- * Virtual module that binds the {@link ConfigurationModule} and the {@link ServiceModule}.
+ * Binds all the services and configuration objects for emailing.
  *
  * @author Brian Pontarelli
  */
 public class EmailModule extends AbstractModule {
   @Override
   protected void configure() {
-    install(new ConfigurationModule());
-    install(new ServiceModule());
+    bind(EmailConfiguration.class).to(DefaultEmailConfiguration.class);
+    bind(EmailService.class).to(DefaultEmailService.class);
+    bind(EmailTransportService.class).to(JavaMailEmailTransportService.class);
   }
 }

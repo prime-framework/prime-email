@@ -27,8 +27,8 @@ import static org.testng.Assert.*;
  */
 public class EmailBuilderImplTest {
   @Test
-  public void testTemplateParams() {
-    EmailCommand eb = new FreeMarkerEmailCommand(null, null, new Email());
+  public void templateParams() {
+    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> {});
     eb = eb.withTemplateParam("key1", "value1").withTemplateParam("key2", "value2");
 
     assertEquals(eb.getTemplateParams().size(), 2);
@@ -38,8 +38,8 @@ public class EmailBuilderImplTest {
   }
 
   @Test
-  public void testSubjectExplicit() {
-    EmailCommand eb = new FreeMarkerEmailCommand(null, null, new Email());
+  public void subjectExplicit() {
+    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> {});
     eb.withSubject("test subject");
     assertEquals(eb.getSubject(), "test subject");
   }

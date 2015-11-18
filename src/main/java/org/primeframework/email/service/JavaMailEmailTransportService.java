@@ -31,9 +31,11 @@ import javax.mail.util.ByteArrayDataSource;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
+import com.google.inject.Inject;
 import org.primeframework.email.EmailException;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
@@ -41,42 +43,31 @@ import org.primeframework.email.domain.EmailAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-
 /**
- * This class implements the {@link EmailTransportService} interface using the JavaMail API and a JavaMail session. This
- * class should normally be handled via Guice as a singleton so that it will only use a single session, reducing the
- * overhead.
- * <p/>
- * The JavaMail session is stored in the JNDI tree and configured via the JEE container. This allows changes to be made
- * in a much simpler and more transparent manner. It also follows the same convention as the JDBC configuration for
- * JPA.
- * <p/>
- * <table> <tr><th>Name</th><th>Description</th><th>Optional</th><th>Default if optional</th></tr>
- * <tr><td>jcatapult.email.jndi-name</td><td>The JNDI name under which the Mail session is stored (relative to the
- * environment root of java:comp/env).</td><td><b>true</b></td><td>mail/Session</td></tr>
- * <tr><td>jcatapult.email.thread-pool.core-size</td><td>The initial size of the thread pool for asynchronous handling
- * of the email sending.</td><td>true</td><td>1</td></tr> <tr><td>jcatapult.email.thread-pool.maximum-size</td><td>The
- * maximum size of the thread pool for asynchronous handling of the email sending.</td><td>true</td><td>5</td></tr>
- * <tr><td>jcatapult.email.thread-pool.keep-alive</td><td>The keep alive time (in milliseconds) to have threads stick
- * around being idle prior to being thrown out.</td><td>true</td><td>500 milliseconds</td></tr> </table>
+ * This class implements the {@link EmailTransportService} interface using the JavaMail API and a JavaMail session.
  *
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
-  private Session session;
   private ExecutorService executorService;
+
+  private Session session;
 
   /**
    * Constructs the transport service.
    *
-   * @param session         The Java mail session.
-   * @param executorService The executor service for asynchronous sending.
+   * @param session The Java mail session.
    */
   @Inject
-  public JavaMailEmailTransportService(Session session, @org.primeframework.email.guice.Email ExecutorService executorService) {
+  public JavaMailEmailTransportService(Session session) {
     this.session = session;
-    this.executorService = executorService;
+    this.executorService = Executors.newCachedThreadPool(
+        (r) -> {
+          Thread t = new Thread(r, "Prime-Email Executor Thread");
+          t.setDaemon(true);
+          return t;
+        }
+    );
   }
 
   /**
@@ -87,7 +78,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       return executorService.submit(new EmailRunnable(message(email), session), email);
     } catch (RejectedExecutionException ree) {
       throw new org.primeframework.email.EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
-        "so that it can be processed at a later time. The email was therefore not sent.", ree);
+          "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
 
@@ -96,7 +87,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       executorService.execute(new EmailRunnable(message(email), session));
     } catch (RejectedExecutionException ree) {
       throw new org.primeframework.email.EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
-        "so that it can be processed at a later time. The email was therefore not sent.", ree);
+          "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
 
@@ -179,7 +170,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       return message;
     } catch (MessagingException e) {
       throw new org.primeframework.email.EmailException("An error occurred while trying to construct the JavaMail Message " +
-        "object", e);
+          "object", e);
     } catch (UnsupportedEncodingException e) {
       throw new org.primeframework.email.EmailException("Unable to create email addresses. The email was therefore not sent.", e);
     }
@@ -190,7 +181,9 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    */
   public static class EmailRunnable implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(EmailRunnable.class);
+
     private Message message;
+
     private Session session;
 
     public EmailRunnable(Message message, Session session) {
