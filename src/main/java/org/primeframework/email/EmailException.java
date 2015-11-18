@@ -23,10 +23,6 @@ import org.primeframework.email.service.EmailService;
  * @author Brian Pontarelli
  */
 public class EmailException extends RuntimeException {
-  public EmailException() {
-    super();
-  }
-
   public EmailException(String message) {
     super(message);
   }

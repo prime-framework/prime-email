@@ -26,9 +26,11 @@ import freemarker.template.Configuration;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * This class tests the FreeMarker email service.
@@ -36,23 +38,48 @@ import static org.testng.Assert.assertEquals;
  * @author Brian Pontarelli
  */
 public class DefaultEmailServiceTest {
-  @Test
-  public void sendEmailClassPath() throws Exception {
+  public Configuration config;
+
+  @BeforeClass
+  public void beforeClass() {
     BeansWrapper wrapper = new BeansWrapper();
     wrapper.setExposeFields(true);
-    Configuration config = new Configuration();
+    config = new Configuration();
     config.setObjectWrapper(wrapper);
+  }
 
+  @Test
+  public void render() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
     DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
-    service.sendEmail("test-template", singletonList(Locale.US)).
-        cc(new EmailAddress("from@example.com")).
-               bcc(new EmailAddress("from@example.com")).
-               withSubject("test subject").
-               from(new EmailAddress("from@example.com")).
-               to(new EmailAddress("to@example.com")).
-               withTemplateParam("key1", "value1").
-               now();
+    Email email = service.render("test-template", singletonList(Locale.US))
+                         .cc(new EmailAddress("from@example.com"))
+                         .bcc(new EmailAddress("from@example.com"))
+                         .withSubject("test subject")
+                         .from(new EmailAddress("from@example.com"))
+                         .to(new EmailAddress("to@example.com"))
+                         .withTemplateParam("key1", "value1")
+                         .now();
+    assertNull(transport.email);
+    assertEquals(email.subject, "test subject");
+    assertEquals(email.from.address, "from@example.com");
+    assertEquals(email.to.get(0).address, "to@example.com");
+    assertEquals(email.text, "Text value1");
+    assertEquals(email.html, "HTML value1");
+  }
+
+  @Test
+  public void sendEmailClassPath() throws Exception {
+    MockEmailTransportService transport = new MockEmailTransportService();
+    DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
+    service.send("test-template", singletonList(Locale.US))
+           .cc(new EmailAddress("from@example.com"))
+           .bcc(new EmailAddress("from@example.com"))
+           .withSubject("test subject")
+           .from(new EmailAddress("from@example.com"))
+           .to(new EmailAddress("to@example.com"))
+           .withTemplateParam("key1", "value1")
+           .now();
     assertEquals(transport.email.subject, "test subject");
     assertEquals(transport.email.from.address, "from@example.com");
     assertEquals(transport.email.to.get(0).address, "to@example.com");
@@ -67,21 +94,16 @@ public class DefaultEmailServiceTest {
     bean.bean2 = new Bean2();
     bean.bean2.hobby = "fishing";
 
-    BeansWrapper wrapper = new BeansWrapper();
-    wrapper.setExposeFields(true);
-    Configuration config = new Configuration();
-    config.setObjectWrapper(wrapper);
-
     MockEmailTransportService transport = new MockEmailTransportService();
     DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
-    service.sendEmail("test-template-with-bean", singletonList(Locale.US)).
-        cc(new EmailAddress("from@example.com")).
-               bcc(new EmailAddress("from@example.com")).
-               withSubject("test subject").
-               from(new EmailAddress("from@example.com")).
-               to(new EmailAddress("to@example.com")).
-               withTemplateParam("bean", bean).
-               now();
+    service.send("test-template-with-bean", singletonList(Locale.US))
+           .cc(new EmailAddress("from@example.com"))
+           .bcc(new EmailAddress("from@example.com"))
+           .withSubject("test subject")
+           .from(new EmailAddress("from@example.com"))
+           .to(new EmailAddress("to@example.com"))
+           .withTemplateParam("bean", bean)
+           .now();
 
     assertEquals(transport.email.subject, "test subject");
     assertEquals(transport.email.from.address, "from@example.com");

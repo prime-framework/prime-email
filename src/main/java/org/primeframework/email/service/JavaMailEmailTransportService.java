@@ -77,7 +77,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     try {
       return executorService.submit(new EmailRunnable(message(email), session), email);
     } catch (RejectedExecutionException ree) {
-      throw new org.primeframework.email.EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
+      throw new EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
           "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
@@ -86,7 +86,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     try {
       executorService.execute(new EmailRunnable(message(email), session));
     } catch (RejectedExecutionException ree) {
-      throw new org.primeframework.email.EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
+      throw new EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
           "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
@@ -169,10 +169,9 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       message.setContent(mp);
       return message;
     } catch (MessagingException e) {
-      throw new org.primeframework.email.EmailException("An error occurred while trying to construct the JavaMail Message " +
-          "object", e);
+      throw new EmailException("An error occurred while trying to construct the JavaMail Message object", e);
     } catch (UnsupportedEncodingException e) {
-      throw new org.primeframework.email.EmailException("Unable to create email addresses. The email was therefore not sent.", e);
+      throw new EmailException("Unable to create email addresses. The email was therefore not sent.", e);
     }
   }
 

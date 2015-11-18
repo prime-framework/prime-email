@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,23 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.service.EmailTransportService;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-
 /**
  * This class provides tests with the ability to setup email handling.
- * <p/>
+ * <p>
  * <b>NOTE:</b> This class is thread safe and can be used in parallel test cases.
  *
  * @author Brian Pontarelli
  */
 public class EmailTestHelper {
   private static ThreadLocal<Queue<Email>> emailResult = new ThreadLocal<Queue<Email>>();
+
   private static ThreadLocal<Future<Email>> future = new ThreadLocal<Future<Email>>();
+
   private static EmailTransportService service;
 
   /**
@@ -50,12 +51,26 @@ public class EmailTestHelper {
   }
 
   /**
+   * @return Returns the mocked out EmailTransportService.
+   */
+  public static EmailTransportService getService() {
+    return service;
+  }
+
+  /**
+   * This method informs the mock that it should reset itself and NOT simulate a timeout when sending an email.
+   */
+  public static void reset() {
+    future.set(new MockFuture(false));
+  }
+
+  /**
    * Mocks out an {@link EmailTransportService} so that an SMTP server is not required to run the tests. This will mock
    * return the mail and also provides the emails via the {@link #getEmailResults()} method on this class. This class is
    * thread safe and can be used in parallel test cases.
    *
    * @return A Guice module that contains the email transport service mock. This module should be used with the injector
-   *         for the test cases.
+   * for the test cases.
    */
   public static Module setup() {
     emailResult.remove();
@@ -88,28 +103,15 @@ public class EmailTestHelper {
   }
 
   /**
-   * @return Returns the mocked out EmailTransportService.
-   */
-  public static EmailTransportService getService() {
-    return service;
-  }
-
-  /**
    * This method informs the mock that it should simulate a timeout when sending an email.
    */
   public static void timeout() {
     future.set(new MockFuture(true));
   }
 
-  /**
-   * This method informs the mock that it should reset itself and NOT simulate a timeout when sending an email.
-   */
-  public static void reset() {
-    future.set(new MockFuture(false));
-  }
-
   public static class MockFuture implements Future<Email> {
     private final boolean timeout;
+
     private boolean cancelled;
 
     public MockFuture(boolean timeout) {
@@ -121,18 +123,10 @@ public class EmailTestHelper {
       return true;
     }
 
-    public boolean isCancelled() {
-      return cancelled;
-    }
-
-    public boolean isDone() {
-      return !timeout;
-    }
-
     public Email get() throws InterruptedException, ExecutionException {
       if (timeout) {
         throw new AssertionError("Timeout set and get() was called. You should be calling " +
-          "get(long, TimeUnit) from you code.");
+            "get(long, TimeUnit) from you code.");
       }
       return emailResult.get().poll();
     }
@@ -142,6 +136,14 @@ public class EmailTestHelper {
         throw new TimeoutException("Timeout");
       }
       return emailResult.get().poll();
+    }
+
+    public boolean isCancelled() {
+      return cancelled;
+    }
+
+    public boolean isDone() {
+      return !timeout;
     }
   }
 }
