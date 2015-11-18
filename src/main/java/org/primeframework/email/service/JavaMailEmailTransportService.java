@@ -36,7 +36,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import com.google.inject.Inject;
-import org.primeframework.email.EmailException;
+import org.primeframework.email.EmailDataException;
+import org.primeframework.email.EmailTransportException;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
@@ -77,7 +78,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     try {
       return executorService.submit(new EmailRunnable(message(email), session), email);
     } catch (RejectedExecutionException ree) {
-      throw new EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
+      throw new EmailTransportException("Unable to submit the JavaMail message to the asynchronous handler " +
           "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
@@ -86,7 +87,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     try {
       executorService.execute(new EmailRunnable(message(email), session));
     } catch (RejectedExecutionException ree) {
-      throw new EmailException("Unable to submit the JavaMail message to the asynchronous handler " +
+      throw new EmailTransportException("Unable to submit the JavaMail message to the asynchronous handler " +
           "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
@@ -97,7 +98,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       Message message = new MimeMessage(session);
       EmailAddress from = email.from;
       if (from == null) {
-        throw new EmailException("email message 'from' not set");
+        throw new EmailDataException("email message 'from' not set");
       }
       message.setFrom(new InternetAddress(from.address, from.display, "UTF-8"));
 
@@ -122,7 +123,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       }
 
       if (message.getAllRecipients() == null || message.getAllRecipients().length == 0) {
-        throw new EmailException("email message must contain at least one CC, BCC, or To recipient");
+        throw new EmailDataException("email message must contain at least one CC, BCC, or To recipient");
       }
 
       String subject = email.subject;
@@ -151,7 +152,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       String html = email.html;
       if (html != null) {
         BodyPart htmlPart = new MimeBodyPart();
-        htmlPart.setContent(html, "text/html");
+        htmlPart.setContent(html, "text/html; charset=UTF-8");
         mp.addBodyPart(htmlPart);
       }
 
@@ -169,9 +170,9 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       message.setContent(mp);
       return message;
     } catch (MessagingException e) {
-      throw new EmailException("An error occurred while trying to construct the JavaMail Message object", e);
+      throw new EmailDataException("An error occurred while trying to construct the JavaMail Message object", e);
     } catch (UnsupportedEncodingException e) {
-      throw new EmailException("Unable to create email addresses. The email was therefore not sent.", e);
+      throw new EmailDataException("Unable to create email addresses. The email was therefore not sent.", e);
     }
   }
 
@@ -202,7 +203,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
         logger.debug("Finished JavaMail send");
       } catch (MessagingException e) {
         logger.error("Unable to send email via JavaMail", e);
-        throw new EmailException("Unable to send email via JavaMail", e);
+        throw new EmailTransportException("Unable to send email via JavaMail", e);
       }
     }
   }

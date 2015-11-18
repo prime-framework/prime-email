@@ -274,7 +274,7 @@ public class EmailBuilder {
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder withTemplateParam(String name, Object value) {
+  public EmailBuilder withTemplateParameter(String name, Object value) {
     params.put(name, value);
     return this;
   }
@@ -282,7 +282,7 @@ public class EmailBuilder {
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder withTemplateParams(Map<String, Object> params) {
+  public EmailBuilder withTemplateParameters(Map<String, Object> params) {
     this.params.putAll(params);
     return this;
   }

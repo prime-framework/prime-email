@@ -34,11 +34,17 @@ public class Email {
 
   public String html;
 
+  public boolean renderHtml;
+
   public EmailAddress replyTo;
 
   public String subject;
 
+  public boolean renderSubject;
+
   public String text;
+
+  public boolean renderText;
 
   public List<EmailAddress> to = new ArrayList<EmailAddress>();
 }

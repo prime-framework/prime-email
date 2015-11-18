@@ -13,17 +13,15 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.email.domain;
+package org.primeframework.email;
 
 /**
+ * A sub-class of EmailException that is thrown when sending an email fails.
+ *
  * @author Brian Pontarelli
  */
-public class EmailTemplate {
-  public EmailAddress from;
-
-  public String subject;
-
-  public String text;
-
-  public String html;
+public class EmailTransportException extends EmailException {
+  public EmailTransportException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

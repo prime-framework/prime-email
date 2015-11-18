@@ -13,7 +13,6 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-
 package org.primeframework.email.domain;
 
 /**
@@ -22,8 +21,11 @@ package org.primeframework.email.domain;
  * @author Brian Pontarelli
  */
 public class EmailAddress {
-  public final String address;
-  public final String display;
+  public String address;
+
+  public String display;
+
+  public boolean renderDisplay;
 
   public EmailAddress(String address) {
     this.address = address;

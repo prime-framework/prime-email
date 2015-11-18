@@ -23,6 +23,7 @@ import java.util.concurrent.TimeoutException;
 
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
+import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
@@ -30,15 +31,62 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.fail;
 
 /**
  * This class tests the FreeMarker email service.
  *
  * @author Brian Pontarelli
  */
+@Test(groups = "unit")
 public class DefaultEmailServiceTest {
   public Configuration config;
+
+  @Test
+  public void badParse() throws Exception {
+    MockEmailTransportService transport = new MockEmailTransportService();
+    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
+    try {
+      service.render("bad-parse-template", singletonList(Locale.US))
+             .cc(new EmailAddress("from@example.com"))
+             .bcc(new EmailAddress("from@example.com"))
+             .withSubject("test subject")
+             .from(new EmailAddress("from@example.com"))
+             .to(new EmailAddress("to@example.com"))
+             .now();
+      fail();
+    } catch (EmailTemplateException e) {
+      // Expected
+      assertNotNull(e.getParseErrors().get("text"));
+      assertNotNull(e.getParseErrors().get("html"));
+    }
+
+    assertNull(transport.email);
+  }
+
+  @Test
+  public void badRender() throws Exception {
+    MockEmailTransportService transport = new MockEmailTransportService();
+    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
+    try {
+      service.render("bad-render-template", singletonList(Locale.US))
+             .cc(new EmailAddress("from@example.com"))
+             .bcc(new EmailAddress("from@example.com"))
+             .withSubject("test subject")
+             .from(new EmailAddress("from@example.com"))
+             .to(new EmailAddress("to@example.com"))
+             .now();
+      fail();
+    } catch (EmailTemplateException e) {
+      // Expected
+      assertNotNull(e.getRenderErrors().get("text"));
+      assertNotNull(e.getRenderErrors().get("html"));
+    }
+
+    assertNull(transport.email);
+  }
 
   @BeforeClass
   public void beforeClass() {
@@ -51,14 +99,14 @@ public class DefaultEmailServiceTest {
   @Test
   public void render() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
+    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
     Email email = service.render("test-template", singletonList(Locale.US))
                          .cc(new EmailAddress("from@example.com"))
                          .bcc(new EmailAddress("from@example.com"))
                          .withSubject("test subject")
                          .from(new EmailAddress("from@example.com"))
                          .to(new EmailAddress("to@example.com"))
-                         .withTemplateParam("key1", "value1")
+                         .withTemplateParameter("key1", "value1")
                          .now();
     assertNull(transport.email);
     assertEquals(email.subject, "test subject");
@@ -71,14 +119,14 @@ public class DefaultEmailServiceTest {
   @Test
   public void sendEmailClassPath() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
+    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
     service.send("test-template", singletonList(Locale.US))
            .cc(new EmailAddress("from@example.com"))
            .bcc(new EmailAddress("from@example.com"))
            .withSubject("test subject")
            .from(new EmailAddress("from@example.com"))
            .to(new EmailAddress("to@example.com"))
-           .withTemplateParam("key1", "value1")
+           .withTemplateParameter("key1", "value1")
            .now();
     assertEquals(transport.email.subject, "test subject");
     assertEquals(transport.email.from.address, "from@example.com");
@@ -95,14 +143,14 @@ public class DefaultEmailServiceTest {
     bean.bean2.hobby = "fishing";
 
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(transport, new FileSystemFreeMarkerEmailTemplateLoader(config, new TestEmailConfiguration()));
+    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
     service.send("test-template-with-bean", singletonList(Locale.US))
            .cc(new EmailAddress("from@example.com"))
            .bcc(new EmailAddress("from@example.com"))
            .withSubject("test subject")
            .from(new EmailAddress("from@example.com"))
            .to(new EmailAddress("to@example.com"))
-           .withTemplateParam("bean", bean)
+           .withTemplateParameter("bean", bean)
            .now();
 
     assertEquals(transport.email.subject, "test subject");

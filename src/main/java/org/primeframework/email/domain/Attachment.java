@@ -18,19 +18,21 @@ package org.primeframework.email.domain;
 /**
  * This class is a simple attachment with a byte array, name and MIME type.
  *
- * @author  Brian Pontarelli
+ * @author Brian Pontarelli
  */
 public class Attachment {
-    public String name;
-    public String mime;
-    public byte[] attachment;
+  public byte[] attachment;
 
-    public Attachment() {
-    }
+  public String mime;
 
-    public Attachment(String name, String mime, byte[] attachment) {
-        this.name = name;
-        this.mime = mime;
-        this.attachment = attachment;
-    }
+  public String name;
+
+  public Attachment() {
+  }
+
+  public Attachment(String name, String mime, byte[] attachment) {
+    this.name = name;
+    this.mime = mime;
+    this.attachment = attachment;
+  }
 }

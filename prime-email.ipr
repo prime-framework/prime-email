@@ -71,6 +71,24 @@
     <option name="OUTPUT_DIRECTORY" />
   </component>
   <component name="IdProvider" IDEtalkID="C3E10093AD37246DAE72198F2F6CDB7D" />
+  <component name="InspectionProjectProfileManager">
+    <profile version="1.0">
+      <option name="myName" value="Project Default" />
+      <option name="myLocal" value="true" />
+      <inspection_tool class="groupsTestNG" enabled="true" level="WARNING" enabled_by_default="true">
+        <option name="groups">
+          <value>
+            <list size="1">
+              <item index="0" class="java.lang.String" itemvalue="unit" />
+            </list>
+          </value>
+        </option>
+      </inspection_tool>
+    </profile>
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
+  </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
     <option name="OPTION_SCOPE" value="protected" />

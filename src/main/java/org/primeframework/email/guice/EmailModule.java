@@ -20,6 +20,7 @@ import org.primeframework.email.config.DefaultEmailConfiguration;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.service.DefaultEmailService;
 import org.primeframework.email.service.EmailService;
+import org.primeframework.email.service.EmailRenderer;
 import org.primeframework.email.service.EmailTransportService;
 import org.primeframework.email.service.JavaMailEmailTransportService;
 
@@ -28,7 +29,17 @@ import org.primeframework.email.service.JavaMailEmailTransportService;
  *
  * @author Brian Pontarelli
  */
-public class EmailModule extends AbstractModule {
+public abstract class EmailModule extends AbstractModule {
+  /**
+   * Implement this method to bind a JavaMail Session Provider (or the session directly if you want).
+   */
+  protected abstract void bindSessionProvider();
+
+  /**
+   * Implement this method to bind the {@link EmailRenderer} interface.
+   */
+  protected abstract void bindTemplateLoader();
+
   @Override
   protected void configure() {
     bind(EmailConfiguration.class).to(DefaultEmailConfiguration.class);

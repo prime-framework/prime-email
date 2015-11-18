@@ -15,16 +15,21 @@
  */
 package org.primeframework.email.service;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 import org.primeframework.email.domain.Email;
 
 /**
- * Loads templates and combines and localizes them into an {@link Email} object.
+ * Loads email templates and renders them.
  *
  * @author Brian Pontarelli
  */
-public interface EmailTemplateLoader {
-  void load(Object templateId, Email email, List<Locale> preferredLanguages);
+public interface EmailRenderer {
+  /**
+   * Renders an EmailTemplate. This doesn't load the template, but just renders the one passed in.
+   *
+   * @param email  The email template to render.
+   * @param params The parameters that are passed to the template.
+   */
+  void render(Email email, Map<String, Object> params);
 }

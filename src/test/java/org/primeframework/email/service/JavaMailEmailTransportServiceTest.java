@@ -32,6 +32,7 @@ import static org.testng.Assert.fail;
  *
  * @author Brian Pontarelli
  */
+@Test(groups = "unit")
 public class JavaMailEmailTransportServiceTest {
   private static Session session;
 

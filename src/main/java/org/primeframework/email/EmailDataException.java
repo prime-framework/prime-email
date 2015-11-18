@@ -13,18 +13,19 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.email.service;
-
-import java.util.List;
-import java.util.Locale;
-
-import org.primeframework.email.domain.Email;
+package org.primeframework.email;
 
 /**
- * Loads templates and combines and localizes them into an {@link Email} object.
+ * A sub-class of EmailException that is thrown when emails lack necessary data to be sent.
  *
  * @author Brian Pontarelli
  */
-public interface EmailTemplateLoader {
-  void load(Object templateId, Email email, List<Locale> preferredLanguages);
+public class EmailDataException extends EmailException {
+  public EmailDataException(String message) {
+    super(message);
+  }
+
+  public EmailDataException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

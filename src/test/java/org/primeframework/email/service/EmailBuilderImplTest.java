@@ -25,11 +25,12 @@ import static org.testng.Assert.*;
  *
  * @author James Humphrey
  */
+@Test(groups = "unit")
 public class EmailBuilderImplTest {
   @Test
   public void templateParams() {
     EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> {});
-    eb = eb.withTemplateParam("key1", "value1").withTemplateParam("key2", "value2");
+    eb = eb.withTemplateParameter("key1", "value1").withTemplateParameter("key2", "value2");
 
     assertEquals(eb.getTemplateParams().size(), 2);
 
