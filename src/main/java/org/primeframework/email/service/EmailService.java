@@ -17,9 +17,11 @@ package org.primeframework.email.service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.primeframework.email.EmailException;
-import org.primeframework.email.domain.Email;
+import org.primeframework.email.EmailTemplateException;
+import org.primeframework.email.domain.EmailTemplates;
 
 /**
  * This interface defines how to send emails in a simple and templatized manner.
@@ -28,32 +30,33 @@ import org.primeframework.email.domain.Email;
  */
 public interface EmailService {
   /**
-   * Called to build a preview of an email. This takes a un-rendered email whose fields (zero or more) might contain
-   * templates that have not been rendered. Every non-null template field in the passed in Email is considered a
-   * template by this method, except email addresses and attachments. This includes display names, text, html, subject,
+   * Builds a preview of an email using raw templates. These templates are passed in rather than loaded using the
+   * {@link EmailTemplateLoader}.
    * etc.
    * <p>
    * Here's an example using this method:
    * <p>
    * <pre>
-   * Email email = new Email()
-   * email.textTemplate = ...;
-   * email = preview().withTemplateParameter("name", "Joe Blow")
-   *                  .to("joe@blow.com")
-   *                  .from("info@example.com")
-   *                  .now();
+   * EmailTemplates emailTemplates = new EmailTemplates()
+   * emailTemplates.text = "Some template ${name}";
+   * Email email = emailService.preview()
+   *                           .withTemplateParameter("name", "Joe Blow")
+   *                           .to("joe@blow.com")
+   *                           .from("info@example.com")
+   *                           .now();
    * System.out.println(email.text);
    * </pre>
    *
-   * @param email (Required) The un-rendered email template.
+   * @param emailTemplates (Required) The un-rendered email template.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
-   * @throws EmailException Sub-classes of this are thrown when the preview building fails.
+   * @throws EmailTemplateException If there were are errors while building the preview.
    */
-  EmailBuilder preview(Email email) throws EmailException;
+  EmailBuilder preview(EmailTemplates emailTemplates) throws EmailException;
 
   /**
-   * Called to build the email using the specified template as the email body, configure the email using the returned
-   * {@link EmailBuilder} object but not send it.
+   * Builds a preview of an email using the templateId that is loaded via the {@link EmailTemplateLoader}. Once the
+   * template is loaded, it is then rendered and returned as an Email (only by calling the now() methods on the
+   * EmailBuilder).
    * <p>
    * Here's an example using the template below named 'hello':
    * <p>
@@ -66,10 +69,11 @@ public interface EmailService {
    * You would call this method like this:
    * <p>
    * <pre>
-   * Email email = render("hello", emptyList()).withTemplateParam("name", "Joe Blow")
-   *                                           .to("joe@blow.com")
-   *                                           .from("info@example.com")
-   *                                           .now();
+   * Email email = emailService.preview("hello", emptyList())
+   *                           .withTemplateParam("name", "Joe Blow")
+   *                           .to("joe@blow.com")
+   *                           .from("info@example.com")
+   *                           .now();
    * System.out.println(email.html);
    * </pre>
    *
@@ -79,11 +83,11 @@ public interface EmailService {
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
    * @throws EmailException Sub-classes of this are thrown when the rendering building fails.
    */
-  EmailBuilder render(Object templateId, List<Locale> preferredLanguages) throws EmailException;
+  EmailBuilder preview(Object templateId, List<Locale> preferredLanguages) throws EmailException;
 
   /**
-   * Called to build the email using the specified template as the email body, configure the email using the returned
-   * {@link EmailBuilder} object and then send the email.
+   * Sends an email using the email template loaded by passing the templateId to the {@link EmailTemplateLoader}. Once
+   * the template is loaded, it is rendered and combine with the data from the {@link EmailBuilder}.
    * <p>
    * Here's an example using the template below named 'hello':
    * <p>
@@ -96,10 +100,11 @@ public interface EmailService {
    * You would call this method like this:
    * <p>
    * <pre>
-   * send("hello", emptyList()).withTemplateParam("name", "Joe Blow")
-   *                           .to("joe@blow.com")
-   *                           .from("info@example.com")
-   *                           .now();
+   * emailService.send("hello", emptyList())
+   *             .withTemplateParam("name", "Joe Blow")
+   *             .to("joe@blow.com")
+   *             .from("info@example.com")
+   *             .now();
    * </pre>
    *
    * @param templateId         (Required) The id of the template. The implementation will dictate the type of template
@@ -109,4 +114,58 @@ public interface EmailService {
    * @throws EmailException Sub-classes of this are thrown when the sending fails.
    */
   EmailBuilder send(Object templateId, List<Locale> preferredLanguages) throws EmailException;
+
+  /**
+   * Validates multiple FreeMarker templates. This will throw an EmailTemplateException that contains all of the errors
+   * encountered in each of the templates while parsing and rendering them.
+   * <p>
+   * Here's an example using this method:
+   * <p>
+   * <pre>
+   * try {
+   *   Map&lt;String, String> templates = new HashMap&lt;>();
+   *   templates.put("subject", "Some template ${foo}");
+   *   emailService.validate(templates, parameters);
+   * } catch (EmailTemplateException e) {
+   *   if (e.getParseErrors().containsKey("subject")) {
+   *     ...
+   *   }
+   *   if (e.getRenderErrors().containsKey("subject")) {
+   *     ...
+   *   }
+   * }
+   * </pre>
+   *
+   * @param emailTemplates (Required) The templates to validate.
+   * @param parameters     (Required) The parameters used to render the template.
+   * @throws EmailTemplateException If there are any errors.
+   */
+  void validate(EmailTemplates emailTemplates, Map<String, Object> parameters) throws EmailTemplateException;
+
+  /**
+   * Validates a single FreeMarker template. This will throw an EmailTemplateException that contains all of the errors
+   * encountered in parsing and rendering the template.
+   * <p>
+   * Here's an example using this method:
+   * <p>
+   * <pre>
+   * try {
+   *   emailService.validate("Some template ${foo}", "subject", parameters);
+   * } catch (EmailTemplateException e) {
+   *   if (e.getParseErrors().containsKey("subject")) {
+   *     ...
+   *   }
+   *   if (e.getRenderErrors().containsKey("subject")) {
+   *     ...
+   *   }
+   * }
+   * </pre>
+   *
+   * @param template     (Required) The template to validate.
+   * @param templateName (Required) The template name used when there are errors to put them in the Maps inside the
+   *                     EmailTemplateException.
+   * @param parameters   (Required) The parameters used to render the template.
+   * @throws EmailTemplateException If there are any errors.
+   */
+  void validate(String template, String templateName, Map<String, Object> parameters) throws EmailTemplateException;
 }

@@ -18,6 +18,7 @@ package org.primeframework.email.service;
 import java.util.List;
 import java.util.Locale;
 
+import freemarker.template.Template;
 import org.primeframework.email.domain.Email;
 
 /**
@@ -34,4 +35,13 @@ public interface EmailTemplateLoader {
    * @param preferredLanguages The preferred languages that are used to localize the templates.
    */
   void load(Object templateId, Email email, List<Locale> preferredLanguages);
+
+  /**
+   * Loads templates and localizes the templates into the template fields inside an {@link Email} object.
+   *
+   * @param templateId         The id template of the templates to load.
+   * @param email              The email to load the templates into.
+   * @param preferredLanguages The preferred languages that are used to localize the templates.
+   */
+  Template parse(String template);
 }
