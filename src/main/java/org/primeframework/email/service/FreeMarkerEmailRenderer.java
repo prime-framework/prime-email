@@ -26,6 +26,8 @@ import org.primeframework.email.EmailException;
 import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.ParsedEmailAddress;
+import org.primeframework.email.domain.ParsedEmailTemplates;
 import static java.util.Collections.emptyMap;
 
 /**
@@ -36,26 +38,27 @@ import static java.util.Collections.emptyMap;
  */
 public class FreeMarkerEmailRenderer implements EmailRenderer {
   @Override
-  public void render(Email email, Map<String, Object> params) {
+  public void render(ParsedEmailTemplates parsedEmailTemplates, Email email, Map<String, Object> parameters)
+      throws EmailTemplateException {
     Map<String, TemplateException> renderErrors = new HashMap<>();
-    renderEmailAddress(email.from, params, "from", renderErrors);
+    renderEmailAddress(parsedEmailTemplates.from, email.from, parameters, "from", renderErrors);
 
-    email.bcc.forEach((bcc) -> renderEmailAddress(bcc, params, "bcc", renderErrors));
-    email.cc.forEach((cc) -> renderEmailAddress(cc, params, "cc", renderErrors));
-    email.to.forEach((to) -> renderEmailAddress(to, params, "to", renderErrors));
+    parsedEmailTemplates.bcc.forEach((bcc) -> renderEmailAddress(bcc, parameters, "bcc", renderErrors));
+    parsedEmailTemplates.cc.forEach((cc) -> renderEmailAddress(cc, parameters, "cc", renderErrors));
+    parsedEmailTemplates.to.forEach((to) -> renderEmailAddress(to, parameters, "to", renderErrors));
 
     if (email.html == null && email.htmlTemplate != null) {
-      email.html = callTemplate(email.htmlTemplate, params, "html", renderErrors);
+      email.html = callTemplate(email.htmlTemplate, parameters, "html", renderErrors);
     }
 
-    renderEmailAddress(email.replyTo, params, "replyTo", renderErrors);
+    renderEmailAddress(email.replyTo, parameters, "replyTo", renderErrors);
 
     if (email.subject == null && email.subjectTemplate != null) {
-      email.subject = callTemplate(email.subjectTemplate, params, "subject", renderErrors);
+      email.subject = callTemplate(email.subjectTemplate, parameters, "subject", renderErrors);
     }
 
     if (email.text == null && email.textTemplate != null) {
-      email.text = callTemplate(email.textTemplate, params, "text", renderErrors);
+      email.text = callTemplate(email.textTemplate, parameters, "text", renderErrors);
     }
 
     if (renderErrors.size() > 0) {
@@ -86,9 +89,10 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
     return writer.toString();
   }
 
-  private void renderEmailAddress(EmailAddress emailAddress, Map<String, Object> params, String part,
+  private void renderEmailAddress(ParsedEmailAddress parsedEmailAddress, EmailAddress emailAddress,
+                                  Map<String, Object> params, String part,
                                   Map<String, TemplateException> renderErrors) {
-    if (emailAddress != null && emailAddress.display == null && emailAddress.displayTemplate != null) {
+    if (parsedEmailAddress != null && parsedEmailAddress.display != null) {
       emailAddress.display = callTemplate(emailAddress.displayTemplate, params, part, renderErrors);
     }
   }

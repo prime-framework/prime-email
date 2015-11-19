@@ -17,7 +17,9 @@ package org.primeframework.email.service;
 
 import java.util.Map;
 
+import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.ParsedEmailTemplates;
 
 /**
  * Loads email templates and renders them.
@@ -26,10 +28,13 @@ import org.primeframework.email.domain.Email;
  */
 public interface EmailRenderer {
   /**
-   * Renders an EmailTemplate. This doesn't load the template, but just renders the one passed in.
+   * Renders the templates with the parameters and then combines it with the email data.
    *
-   * @param email  The email template to render.
-   * @param params The parameters that are passed to the template.
+   * @param parsedEmailTemplates The parsed templates (if any).
+   * @param email                The email data collected from the EmailBuilder.
+   * @param parameters           The parameters to use when rendering.
+   * @throws EmailTemplateException If the parse fails.
    */
-  void render(Email email, Map<String, Object> params);
+  void render(ParsedEmailTemplates parsedEmailTemplates, Email email, Map<String, Object> parameters)
+      throws EmailTemplateException;
 }

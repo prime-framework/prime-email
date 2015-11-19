@@ -22,7 +22,10 @@ import java.util.concurrent.Future;
 
 import com.google.inject.Inject;
 import org.primeframework.email.EmailException;
+import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.ParsedEmailTemplates;
+import org.primeframework.email.domain.RawEmailTemplates;
 
 /**
  * This class implements the {@link EmailService} interface controls the flow of configuring the emails. The {@link
@@ -54,17 +57,21 @@ public class DefaultEmailService implements EmailService {
   }
 
   @Override
-  public EmailBuilder preview(Email email) throws EmailException {
-    return new EmailBuilder(null, email,
-        (emailBuilder) -> null,
-        (emailBuilder) -> preview(emailBuilder.getEmail(), emailBuilder.getParams()));
+  public EmailBuilder preview(RawEmailTemplates rawEmailTemplates) throws EmailException {
+    return new EmailBuilder(null, new Email(),
+        (emailBuilder) -> {
+          throw new EmailException("You can't preview emails in the future");
+        },
+        (emailBuilder) -> preview(rawEmailTemplates, emailBuilder.getEmail(), emailBuilder.getParams()));
   }
 
   @Override
-  public EmailBuilder render(Object templateId, List<Locale> preferredLanguages) throws EmailException {
-    return new EmailBuilder(templateId, new Email(),
-        (emailBuilder) -> null,
-        (emailBuilder) -> render(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages));
+  public EmailBuilder preview(Object templateId, List<Locale> preferredLanguages) throws EmailException {
+    return new EmailBuilder(null, new Email(),
+        (emailBuilder) -> {
+          throw new EmailException("You can't preview emails in the future");
+        },
+        (emailBuilder) -> preview(templateId, preferredLanguages, emailBuilder.getEmail(), emailBuilder.getParams()));
   }
 
   /**
@@ -76,31 +83,21 @@ public class DefaultEmailService implements EmailService {
         (emailBuilder) -> send(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages));
   }
 
-  /**
-   * This call back builds a preview of the templates but does not send the email.
-   *
-   * @param email  The email template to preview.
-   * @param params The params that are sent to the template.
-   * @return The future from the transport.
-   */
-  private Email preview(Email email, Map<String, Object> params) {
-    emailRenderer.render(email, params);
+  @Override
+  public void validate(RawEmailTemplates rawEmailTemplates, Map<String, Object> parameters) throws EmailTemplateException {
+    ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.parse(rawEmailTemplates);
+    emailRenderer.render(parsedEmailTemplates, new Email(), parameters);
+  }
+
+  private Email preview(RawEmailTemplates rawEmailTemplates, Email email, Map<String, Object> parameters) {
+    ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.parse(rawEmailTemplates);
+    emailRenderer.render(parsedEmailTemplates, email, parameters);
     return email;
   }
 
-  /**
-   * This call back renders the templates but does not send it.
-   *
-   * @param templateId         The id of the template to execute.
-   * @param email              The email data from the EmailBuilder.
-   * @param params             The params that are sent to the template.
-   * @param preferredLanguages The preferred languages to render the email template in.
-   * @return The future from the transport.
-   */
-  private Email render(Object templateId, Email email, Map<String, Object> params,
-                       List<Locale> preferredLanguages) {
-    emailTemplateLoader.load(templateId, email, preferredLanguages);
-    emailRenderer.render(email, params);
+  private Email preview(Object templateId, List<Locale> preferredLanguages, Email email, Map<String, Object> parameters) {
+    ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.load(templateId, preferredLanguages);
+    emailRenderer.render(parsedEmailTemplates, email, parameters);
     return email;
   }
 
@@ -110,14 +107,13 @@ public class DefaultEmailService implements EmailService {
    *
    * @param templateId         The id of the template to execute.
    * @param email              The email data from the EmailBuilder.
-   * @param params             The params that are sent to the template.
+   * @param parameters             The params that are sent to the template.
    * @param preferredLanguages The preferred languages to render the email template in.
    * @return The future from the transport.
    */
-  private Email send(Object templateId, Email email, Map<String, Object> params,
-                     List<Locale> preferredLanguages) {
-    emailTemplateLoader.load(templateId, email, preferredLanguages);
-    emailRenderer.render(email, params);
+  private Email send(Object templateId, Email email, Map<String, Object> parameters, List<Locale> preferredLanguages) {
+    ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.load(templateId, preferredLanguages);
+    emailRenderer.render(parsedEmailTemplates, email, parameters);
     emailTransportService.sendEmail(email);
     return email;
   }
@@ -128,13 +124,12 @@ public class DefaultEmailService implements EmailService {
    *
    * @param templateId         The id of the template to execute.
    * @param email              The email to add the text to and send.
-   * @param params             The params that are sent to the template.
+   * @param parameters             The params that are sent to the template.
    * @param preferredLanguages The preferred languages to render the email template in.
    */
-  private Future<Email> sendLater(Object templateId, Email email, Map<String, Object> params,
-                                  List<Locale> preferredLanguages) {
-    emailTemplateLoader.load(templateId, email, preferredLanguages);
-    emailRenderer.render(email, params);
+  private Future<Email> sendLater(Object templateId, Email email, Map<String, Object> parameters, List<Locale> preferredLanguages) {
+    ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.load(templateId, preferredLanguages);
+    emailRenderer.render(parsedEmailTemplates, email, parameters);
     return emailTransportService.sendEmailLater(email);
   }
 }

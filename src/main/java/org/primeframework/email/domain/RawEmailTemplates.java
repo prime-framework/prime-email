@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author Brian Pontarelli
  */
-public class EmailTemplates {
+public class RawEmailTemplates {
   public List<String> bccDisplays = new ArrayList<>();
 
   public List<String> ccDisplays = new ArrayList<>();
@@ -46,10 +46,10 @@ public class EmailTemplates {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof EmailTemplates)) {
+    if (!(o instanceof RawEmailTemplates)) {
       return false;
     }
-    EmailTemplates that = (EmailTemplates) o;
+    RawEmailTemplates that = (RawEmailTemplates) o;
     return Objects.equals(bccDisplays, that.bccDisplays) &&
         Objects.equals(ccDisplays, that.ccDisplays) &&
         Objects.equals(fromDisplay, that.fromDisplay) &&
@@ -63,19 +63,5 @@ public class EmailTemplates {
   @Override
   public int hashCode() {
     return Objects.hash(bccDisplays, ccDisplays, fromDisplay, html, replyToDisplay, subject, text, toDisplays);
-  }
-
-  @Override
-  public String toString() {
-    return "EmailTemplates{" +
-        "bccDisplays=" + bccDisplays +
-        ", ccDisplays=" + ccDisplays +
-        ", fromDisplay='" + fromDisplay + '\'' +
-        ", html='" + html + '\'' +
-        ", replyToDisplay='" + replyToDisplay + '\'' +
-        ", subject='" + subject + '\'' +
-        ", text='" + text + '\'' +
-        ", toDisplays=" + toDisplays +
-        '}';
   }
 }

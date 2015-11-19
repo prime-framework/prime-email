@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.primeframework.email.EmailException;
 import org.primeframework.email.EmailTemplateException;
-import org.primeframework.email.domain.EmailTemplates;
+import org.primeframework.email.domain.RawEmailTemplates;
 
 /**
  * This interface defines how to send emails in a simple and templatized manner.
@@ -47,11 +47,11 @@ public interface EmailService {
    * System.out.println(email.text);
    * </pre>
    *
-   * @param emailTemplates (Required) The un-rendered email template.
+   * @param rawEmailTemplates (Required) The un-rendered email template.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
    * @throws EmailTemplateException If there were are errors while building the preview.
    */
-  EmailBuilder preview(EmailTemplates emailTemplates) throws EmailException;
+  EmailBuilder preview(RawEmailTemplates rawEmailTemplates) throws EmailException;
 
   /**
    * Builds a preview of an email using the templateId that is loaded via the {@link EmailTemplateLoader}. Once the
@@ -136,36 +136,9 @@ public interface EmailService {
    * }
    * </pre>
    *
-   * @param emailTemplates (Required) The templates to validate.
+   * @param rawEmailTemplates (Required) The templates to validate.
    * @param parameters     (Required) The parameters used to render the template.
    * @throws EmailTemplateException If there are any errors.
    */
-  void validate(EmailTemplates emailTemplates, Map<String, Object> parameters) throws EmailTemplateException;
-
-  /**
-   * Validates a single FreeMarker template. This will throw an EmailTemplateException that contains all of the errors
-   * encountered in parsing and rendering the template.
-   * <p>
-   * Here's an example using this method:
-   * <p>
-   * <pre>
-   * try {
-   *   emailService.validate("Some template ${foo}", "subject", parameters);
-   * } catch (EmailTemplateException e) {
-   *   if (e.getParseErrors().containsKey("subject")) {
-   *     ...
-   *   }
-   *   if (e.getRenderErrors().containsKey("subject")) {
-   *     ...
-   *   }
-   * }
-   * </pre>
-   *
-   * @param template     (Required) The template to validate.
-   * @param templateName (Required) The template name used when there are errors to put them in the Maps inside the
-   *                     EmailTemplateException.
-   * @param parameters   (Required) The parameters used to render the template.
-   * @throws EmailTemplateException If there are any errors.
-   */
-  void validate(String template, String templateName, Map<String, Object> parameters) throws EmailTemplateException;
+  void validate(RawEmailTemplates rawEmailTemplates, Map<String, Object> parameters) throws EmailTemplateException;
 }

@@ -18,8 +18,10 @@ package org.primeframework.email.service;
 import java.util.List;
 import java.util.Locale;
 
-import freemarker.template.Template;
+import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.ParsedEmailTemplates;
+import org.primeframework.email.domain.RawEmailTemplates;
 
 /**
  * Loads templates and localizes the templates into the template fields inside an {@link Email} object.
@@ -28,20 +30,21 @@ import org.primeframework.email.domain.Email;
  */
 public interface EmailTemplateLoader {
   /**
-   * Loads templates and localizes the templates into the template fields inside an {@link Email} object.
+   * Loads an existing set of templates for an email.
    *
-   * @param templateId         The id template of the templates to load.
-   * @param email              The email to load the templates into.
-   * @param preferredLanguages The preferred languages that are used to localize the templates.
+   * @param templateId         The id of the template to load.
+   * @param preferredLanguages The preferred langauges that can be used to localize the templates.
+   * @return The parsed email templates.
+   * @throws EmailTemplateException If the parse fails.
    */
-  void load(Object templateId, Email email, List<Locale> preferredLanguages);
+  ParsedEmailTemplates load(Object templateId, List<Locale> preferredLanguages) throws EmailTemplateException;
 
   /**
-   * Loads templates and localizes the templates into the template fields inside an {@link Email} object.
+   * Parses the templates using FreeMarker.
    *
-   * @param templateId         The id template of the templates to load.
-   * @param email              The email to load the templates into.
-   * @param preferredLanguages The preferred languages that are used to localize the templates.
+   * @param rawEmailTemplates The raw email templates.
+   * @return The parsed templates.
+   * @throws EmailTemplateException If the parse fails.
    */
-  Template parse(String template);
+  ParsedEmailTemplates parse(RawEmailTemplates rawEmailTemplates) throws EmailTemplateException;
 }

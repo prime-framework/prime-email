@@ -78,22 +78,4 @@ public class Email {
   public int hashCode() {
     return Objects.hash(attachments, bcc, cc, from, html, htmlTemplate, replyTo, subject, subjectTemplate, text, textTemplate, to);
   }
-
-  @Override
-  public String toString() {
-    return "Email{" +
-        "attachments=" + attachments +
-        ", bcc=" + bcc +
-        ", cc=" + cc +
-        ", from=" + from +
-        ", html='" + html + '\'' +
-        ", htmlTemplate=" + htmlTemplate +
-        ", replyTo=" + replyTo +
-        ", subject='" + subject + '\'' +
-        ", subjectTemplate=" + subjectTemplate +
-        ", text='" + text + '\'' +
-        ", textTemplate=" + textTemplate +
-        ", to=" + to +
-        '}';
-  }
 }
