@@ -29,22 +29,19 @@ import org.primeframework.email.domain.Email;
 public interface EmailService {
   /**
    * Called to build a preview of an email. This takes a un-rendered email whose fields (zero or more) might contain
-   * templates that have not been rendered. Every non-null field in the passed in Email is considered a template by this
-   * method, except email addresses and attachments. This includes display names, text, html, subject, etc.
-   * <p>
-   * This method returns an EmailBuilder that you can use to setup more templates as well or simply add data to the
-   * Email that are templates. Be aware that if you pass in data to the EmailBuilder that contains template variables or
-   * other template code that is invalid, this method will fail. Therefore, if you want to pass in non-template data to
-   * the Email, be sure to escape it for the template language you are using.
+   * templates that have not been rendered. Every non-null template field in the passed in Email is considered a
+   * template by this method, except email addresses and attachments. This includes display names, text, html, subject,
+   * etc.
    * <p>
    * Here's an example using this method:
    * <p>
    * <pre>
-   * Email email = preview(new Email()).withText("Some template ${foo}")
-   *                                   .withTemplateParam("name", "Joe Blow")
-   *                                   .to("joe@blow.com")
-   *                                   .from("info@example.com")
-   *                                   .now();
+   * Email email = new Email()
+   * email.textTemplate = ...;
+   * email = preview().withTemplateParameter("name", "Joe Blow")
+   *                  .to("joe@blow.com")
+   *                  .from("info@example.com")
+   *                  .now();
    * System.out.println(email.text);
    * </pre>
    *

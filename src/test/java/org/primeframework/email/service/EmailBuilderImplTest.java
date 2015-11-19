@@ -17,8 +17,7 @@ package org.primeframework.email.service;
 
 import org.primeframework.email.domain.Email;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This class tests the email command.
@@ -28,20 +27,20 @@ import static org.testng.Assert.*;
 @Test(groups = "unit")
 public class EmailBuilderImplTest {
   @Test
+  public void subjectExplicit() {
+    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
+    eb.withSubject("test subject");
+    assertEquals(eb.getSubject(), "test subject");
+  }
+
+  @Test
   public void templateParams() {
-    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> {});
+    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
     eb = eb.withTemplateParameter("key1", "value1").withTemplateParameter("key2", "value2");
 
     assertEquals(eb.getTemplateParams().size(), 2);
 
     assertEquals(eb.getTemplateParams().get("key1"), "value1");
     assertEquals(eb.getTemplateParams().get("key2"), "value2");
-  }
-
-  @Test
-  public void subjectExplicit() {
-    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> {});
-    eb.withSubject("test subject");
-    assertEquals(eb.getSubject(), "test subject");
   }
 }

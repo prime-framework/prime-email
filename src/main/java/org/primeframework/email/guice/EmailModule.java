@@ -19,9 +19,11 @@ import com.google.inject.AbstractModule;
 import org.primeframework.email.config.DefaultEmailConfiguration;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.service.DefaultEmailService;
-import org.primeframework.email.service.EmailService;
 import org.primeframework.email.service.EmailRenderer;
+import org.primeframework.email.service.EmailService;
+import org.primeframework.email.service.EmailTemplateLoader;
 import org.primeframework.email.service.EmailTransportService;
+import org.primeframework.email.service.FreeMarkerEmailRenderer;
 import org.primeframework.email.service.JavaMailEmailTransportService;
 
 /**
@@ -36,7 +38,7 @@ public abstract class EmailModule extends AbstractModule {
   protected abstract void bindSessionProvider();
 
   /**
-   * Implement this method to bind the {@link EmailRenderer} interface.
+   * Implement this method to bind the {@link EmailTemplateLoader} interface.
    */
   protected abstract void bindTemplateLoader();
 
@@ -45,5 +47,6 @@ public abstract class EmailModule extends AbstractModule {
     bind(EmailConfiguration.class).to(DefaultEmailConfiguration.class);
     bind(EmailService.class).to(DefaultEmailService.class);
     bind(EmailTransportService.class).to(JavaMailEmailTransportService.class);
+    bind(EmailRenderer.class).to(FreeMarkerEmailRenderer.class);
   }
 }

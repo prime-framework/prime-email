@@ -61,7 +61,7 @@ public class JavaMailEmailTransportServiceTest {
     email.html = "<html><body><h3>html</h3></body></html>";
 
     try {
-      Future<Email> future = service.sendEmail(email);
+      Future<Email> future = service.sendEmailLater(email);
       assertNotNull(future);
       future.get();
     } catch (Exception e) {
@@ -82,7 +82,7 @@ public class JavaMailEmailTransportServiceTest {
     email.attachments.add(new Attachment("test.txt", "text/plain", "Hello world".getBytes()));
 
     try {
-      Future<Email> future = service.sendEmail(email);
+      Future<Email> future = service.sendEmailLater(email);
       assertNotNull(future);
       future.get();
     } catch (Exception e) {

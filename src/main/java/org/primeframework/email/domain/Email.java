@@ -17,6 +17,9 @@ package org.primeframework.email.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import freemarker.template.Template;
 
 /**
  * This class is an abstraction of a simple email message.
@@ -24,27 +27,73 @@ import java.util.List;
  * @author Brian Pontarelli
  */
 public class Email {
-  public List<Attachment> attachments = new ArrayList<Attachment>();
+  public List<Attachment> attachments = new ArrayList<>();
 
-  public List<EmailAddress> bcc = new ArrayList<EmailAddress>();
+  public List<EmailAddress> bcc = new ArrayList<>();
 
-  public List<EmailAddress> cc = new ArrayList<EmailAddress>();
+  public List<EmailAddress> cc = new ArrayList<>();
 
   public EmailAddress from;
 
   public String html;
 
-  public boolean renderHtml;
+  public Template htmlTemplate;
 
   public EmailAddress replyTo;
 
   public String subject;
 
-  public boolean renderSubject;
+  public Template subjectTemplate;
 
   public String text;
 
-  public boolean renderText;
+  public Template textTemplate;
 
-  public List<EmailAddress> to = new ArrayList<EmailAddress>();
+  public List<EmailAddress> to = new ArrayList<>();
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Email)) {
+      return false;
+    }
+    Email email = (Email) o;
+    return Objects.equals(attachments, email.attachments) &&
+        Objects.equals(bcc, email.bcc) &&
+        Objects.equals(cc, email.cc) &&
+        Objects.equals(from, email.from) &&
+        Objects.equals(html, email.html) &&
+        Objects.equals(htmlTemplate, email.htmlTemplate) &&
+        Objects.equals(replyTo, email.replyTo) &&
+        Objects.equals(subject, email.subject) &&
+        Objects.equals(subjectTemplate, email.subjectTemplate) &&
+        Objects.equals(text, email.text) &&
+        Objects.equals(textTemplate, email.textTemplate) &&
+        Objects.equals(to, email.to);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(attachments, bcc, cc, from, html, htmlTemplate, replyTo, subject, subjectTemplate, text, textTemplate, to);
+  }
+
+  @Override
+  public String toString() {
+    return "Email{" +
+        "attachments=" + attachments +
+        ", bcc=" + bcc +
+        ", cc=" + cc +
+        ", from=" + from +
+        ", html='" + html + '\'' +
+        ", htmlTemplate=" + htmlTemplate +
+        ", replyTo=" + replyTo +
+        ", subject='" + subject + '\'' +
+        ", subjectTemplate=" + subjectTemplate +
+        ", text='" + text + '\'' +
+        ", textTemplate=" + textTemplate +
+        ", to=" + to +
+        '}';
+  }
 }

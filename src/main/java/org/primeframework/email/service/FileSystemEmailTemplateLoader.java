@@ -16,6 +16,7 @@
 package org.primeframework.email.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,41 +25,43 @@ import com.google.inject.Inject;
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.config.EmailConfiguration;
-import org.primeframework.email.guice.Email;
+import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.EmailAddress;
+import static java.util.Collections.emptyMap;
 
 /**
- * An implementation of the email template loader that loads FreeMarker templates from the file system. The location of
- * the templates is configured via the EmailConfiguration object that is passed into the constructor.
+ * Loads email templates from the file system using a injected FreeMarker Configuration object.
  *
  * @author Brian Pontarelli
  */
-public class FileSystemFreeMarkerEmailRenderer extends BaseFreeMarkerEmailRenderer implements EmailRenderer {
+public class FileSystemEmailTemplateLoader implements EmailTemplateLoader {
+  private final Configuration freeMarkerConfiguration;
+
   private final String templatesLocation;
 
   @Inject
-  public FileSystemFreeMarkerEmailRenderer(EmailConfiguration emailConfiguration,
-                                           @Email Configuration freeMarkerConfiguration) {
-    super(emailConfiguration, freeMarkerConfiguration);
+  public FileSystemEmailTemplateLoader(EmailConfiguration emailConfiguration,
+                                       @org.primeframework.email.guice.Email Configuration freeMarkerConfiguration) {
+    this.freeMarkerConfiguration = freeMarkerConfiguration;
     this.templatesLocation = emailConfiguration.templateLocation();
   }
 
-  /**
-   * Loads a FreeMarker template from the file system.
-   *
-   * @param templateId         The template id (for file loading this is the file name).
-   * @param preferredLanguages The preferred languages.
-   * @return The template or null if it doesn't exist.
-   */
   @Override
-  protected FreeMarkerEmailTemplates loadTemplates(Object templateId, List<Locale> preferredLanguages,
-                                                   Map<String, ParseException> errors) {
-    FreeMarkerEmailTemplates emailTemplates = new FreeMarkerEmailTemplates();
-    emailTemplates.fromNameTemplate = loadTemplate(templateId + "-fromName.ftl", preferredLanguages, "fromName", errors);
-    emailTemplates.htmlTemplate = loadTemplate(templateId + "-html.ftl", preferredLanguages, "html", errors);
-    emailTemplates.subjectTemplate = loadTemplate(templateId + "-subject.ftl", preferredLanguages, "subject", errors);
-    emailTemplates.textTemplate = loadTemplate(templateId + "-text.ftl", preferredLanguages, "text", errors);
-    return emailTemplates;
+  public void load(Object templateId, Email email, List<Locale> preferredLanguages) {
+    if (email.from == null) {
+      email.from = new EmailAddress();
+    }
+
+    Map<String, ParseException> errors = new HashMap<>();
+    email.from.displayTemplate = loadTemplate(templateId + "-from.ftl", preferredLanguages, "from", errors);
+    email.htmlTemplate = loadTemplate(templateId + "-html.ftl", preferredLanguages, "html", errors);
+    email.subjectTemplate = loadTemplate(templateId + "-subject.ftl", preferredLanguages, "subject", errors);
+    email.textTemplate = loadTemplate(templateId + "-text.ftl", preferredLanguages, "text", errors);
+    if (errors.size() > 0) {
+      throw new EmailTemplateException(errors, emptyMap());
+    }
   }
 
   private Template loadTemplate(String templateName, List<Locale> preferredLanguages, String part,

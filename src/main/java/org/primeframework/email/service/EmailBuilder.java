@@ -18,9 +18,7 @@ package org.primeframework.email.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.primeframework.email.domain.Attachment;
@@ -35,9 +33,9 @@ import static java.util.Arrays.asList;
 public class EmailBuilder {
   private final Email email;
 
-  private final Function<EmailBuilder, Future<Email>> futureFunction;
+  private final Function<EmailBuilder, Future<Email>> laterFunction;
 
-  private final Consumer<EmailBuilder> laterConsumer;
+  private final Function<EmailBuilder, Email> nowFunction;
 
   private final Map<String, Object> params = new HashMap<>();
 
@@ -46,15 +44,16 @@ public class EmailBuilder {
   /**
    * Constructs a new instance.
    *
-   * @param templateId The id of the template.
-   * @param email      The email from the configuration.
+   * @param templateId  The id of the template.
+   * @param email       The email from the configuration.
+   * @param nowFunction The function to call when emails are sent now.
    */
-  EmailBuilder(Object templateId, Email email, Function<EmailBuilder, Future<Email>> futureFunction,
-               Consumer<EmailBuilder> laterConsumer) {
+  EmailBuilder(Object templateId, Email email, Function<EmailBuilder, Future<Email>> laterFunction,
+               Function<EmailBuilder, Email> nowFunction) {
     this.templateId = templateId;
     this.email = email;
-    this.futureFunction = futureFunction;
-    this.laterConsumer = laterConsumer;
+    this.laterFunction = laterFunction;
+    this.nowFunction = nowFunction;
   }
 
   /**
@@ -197,23 +196,15 @@ public class EmailBuilder {
   /**
    * {@inheritDoc}
    */
-  public Future<Email> inTheFuture() {
-    return futureFunction.apply(this);
+  public Future<Email> later() {
+    return laterFunction.apply(this);
   }
 
   /**
    * {@inheritDoc}
    */
-  public void later() {
-    laterConsumer.accept(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Email now() throws ExecutionException, InterruptedException {
-    Future<Email> future = futureFunction.apply(this);
-    return future.get();
+  public Email now() {
+    return nowFunction.apply(this);
   }
 
   /**

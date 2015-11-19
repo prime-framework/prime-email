@@ -15,6 +15,8 @@
  */
 package org.primeframework.email.domain;
 
+import freemarker.template.Template;
+
 /**
  * An email address.
  *
@@ -25,7 +27,10 @@ public class EmailAddress {
 
   public String display;
 
-  public boolean renderDisplay;
+  public Template displayTemplate;
+
+  public EmailAddress() {
+  }
 
   public EmailAddress(String address) {
     this.address = address;

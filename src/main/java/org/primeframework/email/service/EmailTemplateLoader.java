@@ -21,10 +21,17 @@ import java.util.Locale;
 import org.primeframework.email.domain.Email;
 
 /**
- * Loads templates and combines and localizes them into an {@link Email} object.
+ * Loads templates and localizes the templates into the template fields inside an {@link Email} object.
  *
  * @author Brian Pontarelli
  */
 public interface EmailTemplateLoader {
+  /**
+   * Loads templates and localizes the templates into the template fields inside an {@link Email} object.
+   *
+   * @param templateId         The id template of the templates to load.
+   * @param email              The email to load the templates into.
+   * @param preferredLanguages The preferred languages that are used to localize the templates.
+   */
   void load(Object templateId, Email email, List<Locale> preferredLanguages);
 }

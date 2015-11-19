@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import com.google.inject.Inject;
 import org.primeframework.email.EmailException;
@@ -57,17 +56,15 @@ public class DefaultEmailService implements EmailService {
   @Override
   public EmailBuilder preview(Email email) throws EmailException {
     return new EmailBuilder(null, email,
-        (emailBuilder) -> preview(emailBuilder.getEmail(), emailBuilder.getParams()),
-        (emailBuilder) -> {
-        });
+        (emailBuilder) -> null,
+        (emailBuilder) -> preview(emailBuilder.getEmail(), emailBuilder.getParams()));
   }
 
   @Override
   public EmailBuilder render(Object templateId, List<Locale> preferredLanguages) throws EmailException {
     return new EmailBuilder(templateId, new Email(),
-        (emailBuilder) -> render(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages),
-        (emailBuilder) -> {
-        });
+        (emailBuilder) -> null,
+        (emailBuilder) -> render(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages));
   }
 
   /**
@@ -75,8 +72,8 @@ public class DefaultEmailService implements EmailService {
    */
   public EmailBuilder send(Object templateId, List<Locale> preferredLanguages) {
     return new EmailBuilder(templateId, new Email(),
-        (emailBuilder) -> send(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages),
-        (emailBuilder) -> sendLater(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages));
+        (emailBuilder) -> sendLater(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages),
+        (emailBuilder) -> send(templateId, emailBuilder.getEmail(), emailBuilder.getParams(), preferredLanguages));
   }
 
   /**
@@ -86,9 +83,9 @@ public class DefaultEmailService implements EmailService {
    * @param params The params that are sent to the template.
    * @return The future from the transport.
    */
-  private Future<Email> preview(Email email, Map<String, Object> params) {
+  private Email preview(Email email, Map<String, Object> params) {
     emailRenderer.render(email, params);
-    return new EmailFuture(email);
+    return email;
   }
 
   /**
@@ -100,11 +97,11 @@ public class DefaultEmailService implements EmailService {
    * @param preferredLanguages The preferred languages to render the email template in.
    * @return The future from the transport.
    */
-  private Future<Email> render(Object templateId, Email email, Map<String, Object> params,
-                               List<Locale> preferredLanguages) {
+  private Email render(Object templateId, Email email, Map<String, Object> params,
+                       List<Locale> preferredLanguages) {
     emailTemplateLoader.load(templateId, email, preferredLanguages);
     emailRenderer.render(email, params);
-    return new EmailFuture(email);
+    return email;
   }
 
   /**
@@ -117,11 +114,12 @@ public class DefaultEmailService implements EmailService {
    * @param preferredLanguages The preferred languages to render the email template in.
    * @return The future from the transport.
    */
-  private Future<Email> send(Object templateId, Email email, Map<String, Object> params,
-                             List<Locale> preferredLanguages) {
+  private Email send(Object templateId, Email email, Map<String, Object> params,
+                     List<Locale> preferredLanguages) {
     emailTemplateLoader.load(templateId, email, preferredLanguages);
     emailRenderer.render(email, params);
-    return emailTransportService.sendEmail(email);
+    emailTransportService.sendEmail(email);
+    return email;
   }
 
   /**
@@ -133,43 +131,10 @@ public class DefaultEmailService implements EmailService {
    * @param params             The params that are sent to the template.
    * @param preferredLanguages The preferred languages to render the email template in.
    */
-  private void sendLater(Object templateId, Email email, Map<String, Object> params,
-                         List<Locale> preferredLanguages) {
+  private Future<Email> sendLater(Object templateId, Email email, Map<String, Object> params,
+                                  List<Locale> preferredLanguages) {
     emailTemplateLoader.load(templateId, email, preferredLanguages);
     emailRenderer.render(email, params);
-    emailTransportService.sendEmailLater(email);
-  }
-
-  private static class EmailFuture implements Future<Email> {
-    private final Email email;
-
-    public EmailFuture(Email email) {
-      this.email = email;
-    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-      return true;
-    }
-
-    @Override
-    public Email get() {
-      return email;
-    }
-
-    @Override
-    public Email get(long timeout, TimeUnit unit) {
-      return email;
-    }
-
-    @Override
-    public boolean isCancelled() {
-      return false;
-    }
-
-    @Override
-    public boolean isDone() {
-      return true;
-    }
+    return emailTransportService.sendEmailLater(email);
   }
 }

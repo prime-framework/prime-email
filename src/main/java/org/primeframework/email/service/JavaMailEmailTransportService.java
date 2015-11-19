@@ -74,18 +74,19 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   /**
    * {@inheritDoc}
    */
-  public Future<Email> sendEmail(Email email) {
+  public void sendEmail(Email email) {
     try {
-      return executorService.submit(new EmailRunnable(message(email), session), email);
+      EmailRunnable runnable = new EmailRunnable(message(email), session);
+      runnable.run();
     } catch (RejectedExecutionException ree) {
       throw new EmailTransportException("Unable to submit the JavaMail message to the asynchronous handler " +
           "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
 
-  public void sendEmailLater(Email email) {
+  public Future<Email> sendEmailLater(Email email) {
     try {
-      executorService.execute(new EmailRunnable(message(email), session));
+      return executorService.submit(new EmailRunnable(message(email), session), email);
     } catch (RejectedExecutionException ree) {
       throw new EmailTransportException("Unable to submit the JavaMail message to the asynchronous handler " +
           "so that it can be processed at a later time. The email was therefore not sent.", ree);

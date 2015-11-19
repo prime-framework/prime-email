@@ -35,9 +35,9 @@ import org.primeframework.email.service.EmailTransportService;
  * @author Brian Pontarelli
  */
 public class EmailTestHelper {
-  private static ThreadLocal<Queue<Email>> emailResult = new ThreadLocal<Queue<Email>>();
+  private static ThreadLocal<Queue<Email>> emailResult = new ThreadLocal<>();
 
-  private static ThreadLocal<Future<Email>> future = new ThreadLocal<Future<Email>>();
+  private static ThreadLocal<Future<Email>> future = new ThreadLocal<>();
 
   private static EmailTransportService service;
 
@@ -77,21 +77,21 @@ public class EmailTestHelper {
     future.set(new MockFuture(false));
 
     service = new EmailTransportService() {
-      public Future<Email> sendEmail(Email email) {
+      public void sendEmail(Email email) {
         if (emailResult.get() == null) {
-          emailResult.set(new LinkedList<Email>());
+          emailResult.set(new LinkedList<>());
+        }
+
+        emailResult.get().offer(email);
+      }
+
+      public Future<Email> sendEmailLater(Email email) {
+        if (emailResult.get() == null) {
+          emailResult.set(new LinkedList<>());
         }
 
         emailResult.get().offer(email);
         return future.get();
-      }
-
-      public void sendEmailLater(Email email) {
-        if (emailResult.get() == null) {
-          emailResult.set(new LinkedList<Email>());
-        }
-
-        emailResult.get().offer(email);
       }
     };
 

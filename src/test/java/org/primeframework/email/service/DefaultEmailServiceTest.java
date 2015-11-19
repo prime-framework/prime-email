@@ -47,7 +47,7 @@ public class DefaultEmailServiceTest {
   @Test
   public void badParse() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
     try {
       service.render("bad-parse-template", singletonList(Locale.US))
              .cc(new EmailAddress("from@example.com"))
@@ -69,7 +69,7 @@ public class DefaultEmailServiceTest {
   @Test
   public void badRender() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
     try {
       service.render("bad-render-template", singletonList(Locale.US))
              .cc(new EmailAddress("from@example.com"))
@@ -99,7 +99,7 @@ public class DefaultEmailServiceTest {
   @Test
   public void render() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
     Email email = service.render("test-template", singletonList(Locale.US))
                          .cc(new EmailAddress("from@example.com"))
                          .bcc(new EmailAddress("from@example.com"))
@@ -119,7 +119,7 @@ public class DefaultEmailServiceTest {
   @Test
   public void sendEmailClassPath() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
     service.send("test-template", singletonList(Locale.US))
            .cc(new EmailAddress("from@example.com"))
            .bcc(new EmailAddress("from@example.com"))
@@ -143,7 +143,7 @@ public class DefaultEmailServiceTest {
     bean.bean2.hobby = "fishing";
 
     MockEmailTransportService transport = new MockEmailTransportService();
-    DefaultEmailService service = new DefaultEmailService(new FileSystemFreeMarkerEmailRenderer(new TestEmailConfiguration(), config), emailTemplateLoader, transport);
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
     service.send("test-template-with-bean", singletonList(Locale.US))
            .cc(new EmailAddress("from@example.com"))
            .bcc(new EmailAddress("from@example.com"))
@@ -163,7 +163,11 @@ public class DefaultEmailServiceTest {
   public static class MockEmailTransportService implements EmailTransportService {
     public Email email;
 
-    public Future<Email> sendEmail(Email email) {
+    public void sendEmail(Email email) {
+      this.email = email;
+    }
+
+    public Future<Email> sendEmailLater(Email email) {
       this.email = email;
       return new Future<Email>() {
         public boolean cancel(boolean mayInterruptIfRunning) {
@@ -187,10 +191,6 @@ public class DefaultEmailServiceTest {
           return false;
         }
       };
-    }
-
-    public void sendEmailLater(Email email) {
-      this.email = email;
     }
   }
 

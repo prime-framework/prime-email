@@ -26,14 +26,11 @@ import org.primeframework.email.domain.Email;
  */
 public interface EmailTransportService {
   /**
-   * Sends an email using some SMTP transport mechanism. An implementation might decide to make the sending be
-   * asynchronous or it might choose to send the email immediately. If it decides to send the email immediately, this
-   * method will return null.
+   * Sends an email using some SMTP transport mechanism. This sends the email immediately.
    *
    * @param email The email to send.
-   * @return A Future for implementations that send email asynchronously.
    */
-  Future<Email> sendEmail(Email email);
+  void sendEmail(Email email);
 
   /**
    * Sends an email using some SMTP transport mechanism. This will always send the message asynchronously and return
@@ -41,5 +38,5 @@ public interface EmailTransportService {
    *
    * @param email The email to send.
    */
-  void sendEmailLater(Email email);
+  Future<Email> sendEmailLater(Email email);
 }
