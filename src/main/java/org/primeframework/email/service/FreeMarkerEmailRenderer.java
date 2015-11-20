@@ -41,24 +41,28 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
   public void render(ParsedEmailTemplates parsedEmailTemplates, Email email, Map<String, Object> parameters)
       throws EmailTemplateException {
     Map<String, TemplateException> renderErrors = new HashMap<>();
-    renderEmailAddress(parsedEmailTemplates.from, email.from, parameters, "from", renderErrors);
-
-    parsedEmailTemplates.bcc.forEach((bcc) -> renderEmailAddress(bcc, parameters, "bcc", renderErrors));
-    parsedEmailTemplates.cc.forEach((cc) -> renderEmailAddress(cc, parameters, "cc", renderErrors));
-    parsedEmailTemplates.to.forEach((to) -> renderEmailAddress(to, parameters, "to", renderErrors));
-
-    if (email.html == null && email.htmlTemplate != null) {
-      email.html = callTemplate(email.htmlTemplate, parameters, "html", renderErrors);
+    if (email.from == null) {
+      email.from = renderEmailAddress(parsedEmailTemplates.from, parameters, "from", renderErrors);
     }
 
-    renderEmailAddress(email.replyTo, parameters, "replyTo", renderErrors);
+    parsedEmailTemplates.bcc.forEach((bcc) -> email.bcc.add(renderEmailAddress(bcc, parameters, "bcc", renderErrors)));
+    parsedEmailTemplates.cc.forEach((cc) -> email.bcc.add(renderEmailAddress(cc, parameters, "cc", renderErrors)));
+    parsedEmailTemplates.to.forEach((to) -> email.bcc.add(renderEmailAddress(to, parameters, "to", renderErrors)));
 
-    if (email.subject == null && email.subjectTemplate != null) {
-      email.subject = callTemplate(email.subjectTemplate, parameters, "subject", renderErrors);
+    if (email.html == null && parsedEmailTemplates.html != null) {
+      email.html = callTemplate(parsedEmailTemplates.html, parameters, "html", renderErrors);
     }
 
-    if (email.text == null && email.textTemplate != null) {
-      email.text = callTemplate(email.textTemplate, parameters, "text", renderErrors);
+    if (email.replyTo == null) {
+      email.replyTo = renderEmailAddress(parsedEmailTemplates.replyTo, parameters, "replyTo", renderErrors);
+    }
+
+    if (email.subject == null && parsedEmailTemplates.subject != null) {
+      email.subject = callTemplate(parsedEmailTemplates.subject, parameters, "subject", renderErrors);
+    }
+
+    if (email.text == null && parsedEmailTemplates.text != null) {
+      email.text = callTemplate(parsedEmailTemplates.text, parameters, "text", renderErrors);
     }
 
     if (renderErrors.size() > 0) {
@@ -89,11 +93,12 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
     return writer.toString();
   }
 
-  private void renderEmailAddress(ParsedEmailAddress parsedEmailAddress, EmailAddress emailAddress,
-                                  Map<String, Object> params, String part,
-                                  Map<String, TemplateException> renderErrors) {
-    if (parsedEmailAddress != null && parsedEmailAddress.display != null) {
-      emailAddress.display = callTemplate(emailAddress.displayTemplate, params, part, renderErrors);
+  private EmailAddress renderEmailAddress(ParsedEmailAddress parsedEmailAddress, Map<String, Object> parameters,
+                                          String part, Map<String, TemplateException> errors) {
+    if (parsedEmailAddress != null) {
+      return new EmailAddress(parsedEmailAddress.address, callTemplate(parsedEmailAddress.display, parameters, part, errors));
     }
+
+    return null;
   }
 }

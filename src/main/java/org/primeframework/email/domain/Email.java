@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import freemarker.template.Template;
-
 /**
  * This class is an abstraction of a simple email message.
  *
@@ -37,17 +35,11 @@ public class Email {
 
   public String html;
 
-  public Template htmlTemplate;
-
   public EmailAddress replyTo;
 
   public String subject;
 
-  public Template subjectTemplate;
-
   public String text;
-
-  public Template textTemplate;
 
   public List<EmailAddress> to = new ArrayList<>();
 
@@ -65,17 +57,14 @@ public class Email {
         Objects.equals(cc, email.cc) &&
         Objects.equals(from, email.from) &&
         Objects.equals(html, email.html) &&
-        Objects.equals(htmlTemplate, email.htmlTemplate) &&
         Objects.equals(replyTo, email.replyTo) &&
         Objects.equals(subject, email.subject) &&
-        Objects.equals(subjectTemplate, email.subjectTemplate) &&
         Objects.equals(text, email.text) &&
-        Objects.equals(textTemplate, email.textTemplate) &&
         Objects.equals(to, email.to);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(attachments, bcc, cc, from, html, htmlTemplate, replyTo, subject, subjectTemplate, text, textTemplate, to);
+    return Objects.hash(attachments, bcc, cc, from, html, replyTo, subject, text, to);
   }
 }

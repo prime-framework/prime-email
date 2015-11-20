@@ -15,20 +15,28 @@
  */
 package org.primeframework.email.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import freemarker.ext.beans.BeansWrapper;
+import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.RawEmailTemplates;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -44,12 +52,21 @@ import static org.testng.Assert.fail;
 public class DefaultEmailServiceTest {
   public Configuration config;
 
+  @BeforeClass
+  public void beforeClass() throws IOException {
+    DefaultObjectWrapper wrapper = new DefaultObjectWrapper(Configuration.VERSION_2_3_23);
+    wrapper.setExposeFields(true);
+    config = new Configuration(Configuration.VERSION_2_3_23);
+    config.setObjectWrapper(wrapper);
+    config.setTemplateLoader(new FileTemplateLoader(new File("src/test/resources")));
+  }
+
   @Test
-  public void badParse() throws Exception {
+  public void preview_existing_badParse() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
     try {
-      service.render("bad-parse-template", singletonList(Locale.US))
+      service.preview("bad-parse-template", singletonList(Locale.US))
              .cc(new EmailAddress("from@example.com"))
              .bcc(new EmailAddress("from@example.com"))
              .withSubject("test subject")
@@ -67,11 +84,11 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void badRender() throws Exception {
+  public void preview_existing_badRender() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
     try {
-      service.render("bad-render-template", singletonList(Locale.US))
+      service.preview("bad-render-template", singletonList(Locale.US))
              .cc(new EmailAddress("from@example.com"))
              .bcc(new EmailAddress("from@example.com"))
              .withSubject("test subject")
@@ -88,19 +105,57 @@ public class DefaultEmailServiceTest {
     assertNull(transport.email);
   }
 
-  @BeforeClass
-  public void beforeClass() {
-    BeansWrapper wrapper = new BeansWrapper();
-    wrapper.setExposeFields(true);
-    config = new Configuration();
-    config.setObjectWrapper(wrapper);
+  @Test
+  public void preview_raw_badParse() throws Exception {
+    MockEmailTransportService transport = new MockEmailTransportService();
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
+    try {
+      RawEmailTemplates rawEmailTemplates = loadRaw(Paths.get("src/test/resources/templates/bad-parse-template-text.ftl"), Paths.get("src/test/resources/templates/bad-parse-template-html.ftl"));
+      service.preview(rawEmailTemplates)
+             .cc(new EmailAddress("from@example.com"))
+             .bcc(new EmailAddress("from@example.com"))
+             .withSubject("test subject")
+             .from(new EmailAddress("from@example.com"))
+             .to(new EmailAddress("to@example.com"))
+             .now();
+      fail();
+    } catch (EmailTemplateException e) {
+      // Expected
+      assertNotNull(e.getParseErrors().get("text"));
+      assertNotNull(e.getParseErrors().get("html"));
+    }
+
+    assertNull(transport.email);
+  }
+
+  @Test
+  public void preview_raw_badRender() throws Exception {
+    MockEmailTransportService transport = new MockEmailTransportService();
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
+    try {
+      RawEmailTemplates rawEmailTemplates = loadRaw(Paths.get("src/test/resources/templates/bad-render-template-text.ftl"), Paths.get("src/test/resources/templates/bad-render-template-html.ftl"));
+      service.preview(rawEmailTemplates)
+             .cc(new EmailAddress("from@example.com"))
+             .bcc(new EmailAddress("from@example.com"))
+             .withSubject("test subject")
+             .from(new EmailAddress("from@example.com"))
+             .to(new EmailAddress("to@example.com"))
+             .now();
+      fail();
+    } catch (EmailTemplateException e) {
+      // Expected
+      assertNotNull(e.getRenderErrors().get("text"));
+      assertNotNull(e.getRenderErrors().get("html"));
+    }
+
+    assertNull(transport.email);
   }
 
   @Test
   public void render() throws Exception {
     MockEmailTransportService transport = new MockEmailTransportService();
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
-    Email email = service.render("test-template", singletonList(Locale.US))
+    Email email = service.preview("test-template", singletonList(Locale.US))
                          .cc(new EmailAddress("from@example.com"))
                          .bcc(new EmailAddress("from@example.com"))
                          .withSubject("test subject")
@@ -160,6 +215,47 @@ public class DefaultEmailServiceTest {
     assertEquals(transport.email.html, "HTML frank likes fishing");
   }
 
+  @Test
+  public void validate_badParse() throws Exception {
+    MockEmailTransportService transport = new MockEmailTransportService();
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
+    try {
+      RawEmailTemplates rawEmailTemplates = loadRaw(Paths.get("src/test/resources/templates/bad-parse-template-text.ftl"), Paths.get("src/test/resources/templates/bad-parse-template-html.ftl"));
+      service.validate(rawEmailTemplates, emptyMap());
+      fail();
+    } catch (EmailTemplateException e) {
+      // Expected
+      assertNotNull(e.getParseErrors().get("text"));
+      assertNotNull(e.getParseErrors().get("html"));
+    }
+
+    assertNull(transport.email);
+  }
+
+  @Test
+  public void validate_badRender() throws Exception {
+    MockEmailTransportService transport = new MockEmailTransportService();
+    DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), transport);
+    try {
+      RawEmailTemplates rawEmailTemplates = loadRaw(Paths.get("src/test/resources/templates/bad-render-template-text.ftl"), Paths.get("src/test/resources/templates/bad-render-template-html.ftl"));
+      service.validate(rawEmailTemplates, emptyMap());
+      fail();
+    } catch (EmailTemplateException e) {
+      // Expected
+      assertNotNull(e.getRenderErrors().get("text"));
+      assertNotNull(e.getRenderErrors().get("html"));
+    }
+
+    assertNull(transport.email);
+  }
+
+  private RawEmailTemplates loadRaw(Path textPath, Path htmlPath) throws IOException {
+    RawEmailTemplates rawEmailTemplates = new RawEmailTemplates();
+    rawEmailTemplates.text = new String(Files.readAllBytes(textPath));
+    rawEmailTemplates.html = new String(Files.readAllBytes(htmlPath));
+    return rawEmailTemplates;
+  }
+
   public static class MockEmailTransportService implements EmailTransportService {
     public Email email;
 
@@ -197,7 +293,7 @@ public class DefaultEmailServiceTest {
   public static class TestEmailConfiguration implements EmailConfiguration {
     @Override
     public String templateLocation() {
-      return "src/test/java/org/primeframework/email";
+      return "templates";
     }
   }
 }
