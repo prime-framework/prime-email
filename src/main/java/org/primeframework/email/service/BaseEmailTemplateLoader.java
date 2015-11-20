@@ -51,8 +51,8 @@ public abstract class BaseEmailTemplateLoader implements EmailTemplateLoader {
     rawEmailTemplates.ccDisplays.forEach((ccDisplay) -> parsedEmailTemplates.cc.add(new ParsedEmailAddress(null, parseTemplate(ccDisplay, "cc", errors))));
     rawEmailTemplates.toDisplays.forEach((toDisplay) -> parsedEmailTemplates.to.add(new ParsedEmailAddress(null, parseTemplate(toDisplay, "to", errors))));
     parsedEmailTemplates.html = parseTemplate(rawEmailTemplates.html, "html", errors);
-    parsedEmailTemplates.subject = parseTemplate(rawEmailTemplates.html, "html", errors);
-    parsedEmailTemplates.text = parseTemplate(rawEmailTemplates.html, "html", errors);
+    parsedEmailTemplates.subject = parseTemplate(rawEmailTemplates.subject, "subject", errors);
+    parsedEmailTemplates.text = parseTemplate(rawEmailTemplates.text, "text", errors);
     if (errors.size() > 0) {
       throw new EmailTemplateException(errors, emptyMap());
     }

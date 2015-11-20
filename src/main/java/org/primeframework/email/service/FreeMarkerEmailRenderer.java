@@ -41,7 +41,8 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
   public void render(ParsedEmailTemplates parsedEmailTemplates, Email email, Map<String, Object> parameters)
       throws EmailTemplateException {
     Map<String, TemplateException> renderErrors = new HashMap<>();
-    if (email.from == null) {
+
+    if (email.from == null && parsedEmailTemplates.from != null) {
       email.from = renderEmailAddress(parsedEmailTemplates.from, parameters, "from", renderErrors);
     }
 
@@ -81,6 +82,10 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
    */
   protected String callTemplate(Template template, Map<String, Object> parameters, String part,
                                 Map<String, TemplateException> errors) {
+    if (template == null) {
+      return null;
+    }
+
     StringWriter writer = new StringWriter();
     try {
       template.process(parameters, writer);
