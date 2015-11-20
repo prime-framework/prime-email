@@ -30,6 +30,7 @@ import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.ParsedEmailAddress;
 import org.primeframework.email.domain.ParsedEmailTemplates;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
 
 /**
  * Loads email templates from the file system using a injected FreeMarker Configuration object.
@@ -37,6 +38,8 @@ import static java.util.Collections.emptyMap;
  * @author Brian Pontarelli
  */
 public class FileSystemEmailTemplateLoader extends BaseEmailTemplateLoader {
+  public static final List<Locale> EMPTY_LOCALES = singletonList(null);
+
   private final String templatesLocation;
 
   @Inject
@@ -65,6 +68,10 @@ public class FileSystemEmailTemplateLoader extends BaseEmailTemplateLoader {
 
   private Template loadTemplate(String templateName, List<Locale> preferredLanguages, String part,
                                 Map<String, ParseException> errors) {
+    if (preferredLanguages == null || preferredLanguages.isEmpty()) {
+      preferredLanguages = EMPTY_LOCALES;
+    }
+
     for (Locale preferredLanguage : preferredLanguages) {
       try {
         return freeMarkerConfiguration.getTemplate(templatesLocation + "/" + templateName, preferredLanguage);

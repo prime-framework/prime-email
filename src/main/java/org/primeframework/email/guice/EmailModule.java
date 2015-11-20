@@ -48,5 +48,8 @@ public abstract class EmailModule extends AbstractModule {
     bind(EmailService.class).to(DefaultEmailService.class);
     bind(EmailTransportService.class).to(JavaMailEmailTransportService.class);
     bind(EmailRenderer.class).to(FreeMarkerEmailRenderer.class);
+
+    bindSessionProvider();
+    bindTemplateLoader();
   }
 }
