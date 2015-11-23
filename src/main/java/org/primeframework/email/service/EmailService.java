@@ -51,7 +51,7 @@ public interface EmailService {
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
    * @throws EmailTemplateException If there were are errors while building the preview.
    */
-  EmailBuilder preview(RawEmailTemplates rawEmailTemplates) throws EmailException;
+  EmailBuilder preview(RawEmailTemplates rawEmailTemplates) throws EmailTemplateException;
 
   /**
    * Builds a preview of an email using the templateId that is loaded via the {@link EmailTemplateLoader}. Once the

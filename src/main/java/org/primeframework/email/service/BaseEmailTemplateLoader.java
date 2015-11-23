@@ -41,12 +41,17 @@ public abstract class BaseEmailTemplateLoader implements EmailTemplateLoader {
   @Override
   public ParsedEmailTemplates parse(RawEmailTemplates rawEmailTemplates) throws EmailTemplateException {
     ParsedEmailTemplates parsedEmailTemplates = new ParsedEmailTemplates();
-    parsedEmailTemplates.from = new ParsedEmailAddress();
-    parsedEmailTemplates.replyTo = new ParsedEmailAddress();
 
     Map<String, ParseException> errors = new HashMap<>();
-    parsedEmailTemplates.from.display = parseTemplate(rawEmailTemplates.fromDisplay, "from", errors);
-    parsedEmailTemplates.replyTo.display = parseTemplate(rawEmailTemplates.replyToDisplay, "replyTo", errors);
+    if (rawEmailTemplates.fromDisplay != null) {
+      parsedEmailTemplates.from = new ParsedEmailAddress();
+      parsedEmailTemplates.from.display = parseTemplate(rawEmailTemplates.fromDisplay, "from", errors);
+    }
+    if (rawEmailTemplates.replyToDisplay != null) {
+      parsedEmailTemplates.replyTo = new ParsedEmailAddress();
+      parsedEmailTemplates.replyTo.display = parseTemplate(rawEmailTemplates.replyToDisplay, "replyTo", errors);
+    }
+
     rawEmailTemplates.bccDisplays.forEach((bccDisplay) -> parsedEmailTemplates.bcc.add(new ParsedEmailAddress(null, parseTemplate(bccDisplay, "bcc", errors))));
     rawEmailTemplates.ccDisplays.forEach((ccDisplay) -> parsedEmailTemplates.cc.add(new ParsedEmailAddress(null, parseTemplate(ccDisplay, "cc", errors))));
     rawEmailTemplates.toDisplays.forEach((toDisplay) -> parsedEmailTemplates.to.add(new ParsedEmailAddress(null, parseTemplate(toDisplay, "to", errors))));
@@ -54,13 +59,21 @@ public abstract class BaseEmailTemplateLoader implements EmailTemplateLoader {
     parsedEmailTemplates.subject = parseTemplate(rawEmailTemplates.subject, "subject", errors);
     parsedEmailTemplates.text = parseTemplate(rawEmailTemplates.text, "text", errors);
     if (errors.size() > 0) {
-      throw new EmailTemplateException(errors, emptyMap());
+      throw new EmailTemplateException(null, errors, emptyMap());
     }
 
     return parsedEmailTemplates;
   }
 
-  private Template parseTemplate(String template, String part, Map<String, ParseException> errors) {
+  /**
+   * Parses the FreeMarker template using the FreeMarker Configuration object.
+   *
+   * @param template The template to parse.
+   * @param part     The part of the email the template is for (i.e. subject, from, etc).
+   * @param errors   The errors map to put any parse exceptions in under the part key.
+   * @return The FreeMarker Template object.
+   */
+  protected Template parseTemplate(String template, String part, Map<String, ParseException> errors) {
     if (template == null) {
       return null;
     }

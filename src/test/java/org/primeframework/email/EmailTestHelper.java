@@ -35,9 +35,9 @@ import org.primeframework.email.service.EmailTransportService;
  * @author Brian Pontarelli
  */
 public class EmailTestHelper {
-  private static ThreadLocal<Queue<Email>> emailResult = new ThreadLocal<>();
+  private static Queue<Email> emailResult = new LinkedList<>();
 
-  private static ThreadLocal<Future<Email>> future = new ThreadLocal<>();
+  private static Future<Email> future = new MockFuture(false);
 
   private static EmailTransportService service;
 
@@ -47,7 +47,7 @@ public class EmailTestHelper {
    * @return The email results or null if there isn't any.
    */
   public static Queue<Email> getEmailResults() {
-    return emailResult.get();
+    return emailResult;
   }
 
   /**
@@ -61,7 +61,8 @@ public class EmailTestHelper {
    * This method informs the mock that it should reset itself and NOT simulate a timeout when sending an email.
    */
   public static void reset() {
-    future.set(new MockFuture(false));
+    future = new MockFuture(false);
+    emailResult.clear();
   }
 
   /**
@@ -73,25 +74,16 @@ public class EmailTestHelper {
    * for the test cases.
    */
   public static Module setup() {
-    emailResult.remove();
-    future.set(new MockFuture(false));
+    future = new MockFuture(false);
 
     service = new EmailTransportService() {
       public void sendEmail(Email email) {
-        if (emailResult.get() == null) {
-          emailResult.set(new LinkedList<>());
-        }
-
-        emailResult.get().offer(email);
+        emailResult.offer(email);
       }
 
       public Future<Email> sendEmailLater(Email email) {
-        if (emailResult.get() == null) {
-          emailResult.set(new LinkedList<>());
-        }
-
-        emailResult.get().offer(email);
-        return future.get();
+        emailResult.offer(email);
+        return future;
       }
     };
 
@@ -106,7 +98,7 @@ public class EmailTestHelper {
    * This method informs the mock that it should simulate a timeout when sending an email.
    */
   public static void timeout() {
-    future.set(new MockFuture(true));
+    future = new MockFuture(true);
   }
 
   public static class MockFuture implements Future<Email> {
@@ -128,14 +120,14 @@ public class EmailTestHelper {
         throw new AssertionError("Timeout set and get() was called. You should be calling " +
             "get(long, TimeUnit) from you code.");
       }
-      return emailResult.get().poll();
+      return emailResult.poll();
     }
 
     public Email get(long duration, TimeUnit unit) throws TimeoutException {
       if (timeout) {
         throw new TimeoutException("Timeout");
       }
-      return emailResult.get().poll();
+      return emailResult.poll();
     }
 
     public boolean isCancelled() {

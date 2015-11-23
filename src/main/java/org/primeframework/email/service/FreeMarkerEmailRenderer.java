@@ -67,7 +67,7 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
     }
 
     if (renderErrors.size() > 0) {
-      throw new EmailTemplateException(emptyMap(), renderErrors);
+      throw new EmailTemplateException(email, emptyMap(), renderErrors);
     }
   }
 
