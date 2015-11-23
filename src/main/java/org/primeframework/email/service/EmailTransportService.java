@@ -15,9 +15,8 @@
  */
 package org.primeframework.email.service;
 
-import java.util.concurrent.Future;
-
 import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.SendResult;
 
 /**
  * This interface defines the transport mechanism for sending email messages.
@@ -28,15 +27,17 @@ public interface EmailTransportService {
   /**
    * Sends an email using some SMTP transport mechanism. This sends the email immediately.
    *
-   * @param email The email to send.
+   * @param email      The email to send.
+   * @param sendResult The send result where errors and emails are stored.
    */
-  void sendEmail(Email email);
+  void sendEmail(Email email, SendResult sendResult);
 
   /**
    * Sends an email using some SMTP transport mechanism. This will always send the message asynchronously and return
    * control immediately to the caller.
    *
-   * @param email The email to send.
+   * @param email      The email to send.
+   * @param sendResult The send result where errors and emails are stored.
    */
-  Future<Email> sendEmailLater(Email email);
+  void sendEmailLater(Email email, SendResult sendResult);
 }

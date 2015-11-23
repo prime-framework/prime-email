@@ -25,6 +25,7 @@ import java.util.concurrent.TimeoutException;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.SendResult;
 import org.primeframework.email.service.EmailTransportService;
 
 /**
@@ -37,7 +38,7 @@ import org.primeframework.email.service.EmailTransportService;
 public class EmailTestHelper {
   private static Queue<Email> emailResult = new LinkedList<>();
 
-  private static Future<Email> future = new MockFuture(false);
+  private static Future<SendResult> future = new MockFuture(false);
 
   private static EmailTransportService service;
 
@@ -77,13 +78,17 @@ public class EmailTestHelper {
     future = new MockFuture(false);
 
     service = new EmailTransportService() {
-      public void sendEmail(Email email) {
-        emailResult.offer(email);
+      public void sendEmail(Email email, SendResult sendResult) {
+        if (sendResult.wasSuccessful()) {
+          emailResult.offer(email);
+        }
       }
 
-      public Future<Email> sendEmailLater(Email email) {
-        emailResult.offer(email);
-        return future;
+      public void sendEmailLater(Email email, SendResult sendResult) {
+        if (sendResult.wasSuccessful()) {
+          emailResult.offer(email);
+          sendResult.future = future;
+        }
       }
     };
 
@@ -101,7 +106,7 @@ public class EmailTestHelper {
     future = new MockFuture(true);
   }
 
-  public static class MockFuture implements Future<Email> {
+  public static class MockFuture implements Future<SendResult> {
     private final boolean timeout;
 
     private boolean cancelled;
@@ -115,19 +120,19 @@ public class EmailTestHelper {
       return true;
     }
 
-    public Email get() throws InterruptedException, ExecutionException {
+    public SendResult get() throws InterruptedException, ExecutionException {
       if (timeout) {
         throw new AssertionError("Timeout set and get() was called. You should be calling " +
             "get(long, TimeUnit) from you code.");
       }
-      return emailResult.poll();
+      return new SendResult(emailResult.poll());
     }
 
-    public Email get(long duration, TimeUnit unit) throws TimeoutException {
+    public SendResult get(long duration, TimeUnit unit) throws TimeoutException {
       if (timeout) {
         throw new TimeoutException("Timeout");
       }
-      return emailResult.poll();
+      return new SendResult(emailResult.poll());
     }
 
     public boolean isCancelled() {

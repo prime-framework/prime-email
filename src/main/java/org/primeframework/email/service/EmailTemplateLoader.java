@@ -18,7 +18,7 @@ package org.primeframework.email.service;
 import java.util.List;
 import java.util.Locale;
 
-import org.primeframework.email.EmailTemplateException;
+import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.ParsedEmailTemplates;
 import org.primeframework.email.domain.RawEmailTemplates;
@@ -34,17 +34,17 @@ public interface EmailTemplateLoader {
    *
    * @param templateId         The id of the template to load.
    * @param preferredLanguages The preferred langauges that can be used to localize the templates.
+   * @param baseResult         The base result that errors are added to.
    * @return The parsed email templates.
-   * @throws EmailTemplateException If the parse fails.
    */
-  ParsedEmailTemplates load(Object templateId, List<Locale> preferredLanguages) throws EmailTemplateException;
+  ParsedEmailTemplates load(Object templateId, List<Locale> preferredLanguages, BaseResult baseResult);
 
   /**
    * Parses the templates using FreeMarker.
    *
    * @param rawEmailTemplates The raw email templates.
+   * @param baseResult        The base result that errors are added to.
    * @return The parsed templates.
-   * @throws EmailTemplateException If the parse fails.
    */
-  ParsedEmailTemplates parse(RawEmailTemplates rawEmailTemplates) throws EmailTemplateException;
+  ParsedEmailTemplates parse(RawEmailTemplates rawEmailTemplates, BaseResult baseResult);
 }

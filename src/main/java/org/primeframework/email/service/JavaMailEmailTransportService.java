@@ -32,15 +32,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 
 import com.google.inject.Inject;
-import org.primeframework.email.EmailDataException;
-import org.primeframework.email.EmailTransportException;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.SendResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,32 +72,36 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   /**
    * {@inheritDoc}
    */
-  public void sendEmail(Email email) {
-    try {
-      EmailRunnable runnable = new EmailRunnable(message(email), session);
+  @Override
+  public void sendEmail(Email email, SendResult sendResult) {
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult), session, sendResult);
+    if (sendResult.wasSuccessful()) {
       runnable.run();
-    } catch (RejectedExecutionException ree) {
-      throw new EmailTransportException("Unable to submit the JavaMail message to the asynchronous handler " +
-          "so that it can be processed at a later time. The email was therefore not sent.", ree);
     }
   }
 
-  public Future<Email> sendEmailLater(Email email) {
-    try {
-      return executorService.submit(new EmailRunnable(message(email), session), email);
-    } catch (RejectedExecutionException ree) {
-      throw new EmailTransportException("Unable to submit the JavaMail message to the asynchronous handler " +
-          "so that it can be processed at a later time. The email was therefore not sent.", ree);
+  @Override
+  public void sendEmailLater(Email email, SendResult sendResult) {
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult), session, sendResult);
+    if (sendResult.wasSuccessful()) {
+      try {
+        sendResult.future = executorService.submit(runnable, sendResult);
+      } catch (RejectedExecutionException ree) {
+        sendResult.transportError = "Unable to submit the JavaMail message to the asynchronous handler " +
+            "so that it can be processed at a later time. The email was therefore not sent.";
+      }
     }
   }
 
-  private Message message(Email email) {
+  private Message message(Email email, SendResult sendResult) {
+    Message message = new MimeMessage(session);
+
     try {
       // Define message
-      Message message = new MimeMessage(session);
       EmailAddress from = email.from;
       if (from == null) {
-        throw new EmailDataException("email message 'from' not set");
+        sendResult.transportError = "email message 'from' not set";
+        return message;
       }
       message.setFrom(new InternetAddress(from.address, from.display, "UTF-8"));
 
@@ -124,7 +126,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       }
 
       if (message.getAllRecipients() == null || message.getAllRecipients().length == 0) {
-        throw new EmailDataException("email message must contain at least one CC, BCC, or To recipient");
+        sendResult.transportError = "email message must contain at least one CC, BCC, or To recipient";
+        return message;
       }
 
       String subject = email.subject;
@@ -171,9 +174,11 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       message.setContent(mp);
       return message;
     } catch (MessagingException e) {
-      throw new EmailDataException("An error occurred while trying to construct the JavaMail Message object", e);
+      sendResult.transportError = "An error occurred while trying to construct the JavaMail Message object";
+      return message;
     } catch (UnsupportedEncodingException e) {
-      throw new EmailDataException("Unable to create email addresses. The email was therefore not sent.", e);
+      sendResult.transportError = "Unable to create email addresses. The email was therefore not sent.";
+      return message;
     }
   }
 
@@ -183,13 +188,16 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   public static class EmailRunnable implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(EmailRunnable.class);
 
-    private Message message;
+    private final Message message;
 
-    private Session session;
+    private final SendResult sendResult;
 
-    public EmailRunnable(Message message, Session session) {
+    private final Session session;
+
+    public EmailRunnable(Message message, Session session, SendResult sendResult) {
       this.message = message;
       this.session = session;
+      this.sendResult = sendResult;
     }
 
     public void run() {
@@ -204,7 +212,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
         logger.debug("Finished JavaMail send");
       } catch (MessagingException e) {
         logger.error("Unable to send email via JavaMail", e);
-        throw new EmailTransportException("Unable to send email via JavaMail", e);
+        sendResult.transportError = "Unable to send email via JavaMail";
       }
     }
   }

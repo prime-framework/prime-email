@@ -16,20 +16,17 @@
 package org.primeframework.email.service;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import com.google.inject.Inject;
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.config.EmailConfiguration;
+import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.ParsedEmailAddress;
 import org.primeframework.email.domain.ParsedEmailTemplates;
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 /**
@@ -50,24 +47,19 @@ public class FileSystemEmailTemplateLoader extends BaseEmailTemplateLoader {
   }
 
   @Override
-  public ParsedEmailTemplates load(Object templateId, List<Locale> preferredLanguages) throws EmailTemplateException {
+  public ParsedEmailTemplates load(Object templateId, List<Locale> preferredLanguages, BaseResult baseResult) {
     ParsedEmailTemplates parsedEmailTemplates = new ParsedEmailTemplates();
     parsedEmailTemplates.from = new ParsedEmailAddress();
 
-    Map<String, ParseException> errors = new HashMap<>();
-    parsedEmailTemplates.from.display = loadTemplate(templateId + "-from.ftl", preferredLanguages, "from", errors);
-    parsedEmailTemplates.html = loadTemplate(templateId + "-html.ftl", preferredLanguages, "html", errors);
-    parsedEmailTemplates.subject = loadTemplate(templateId + "-subject.ftl", preferredLanguages, "subject", errors);
-    parsedEmailTemplates.text = loadTemplate(templateId + "-text.ftl", preferredLanguages, "text", errors);
-    if (errors.size() > 0) {
-      throw new EmailTemplateException(errors, emptyMap());
-    }
-
+    parsedEmailTemplates.from.display = loadTemplate(templateId + "-from.ftl", preferredLanguages, "from", baseResult);
+    parsedEmailTemplates.html = loadTemplate(templateId + "-html.ftl", preferredLanguages, "html", baseResult);
+    parsedEmailTemplates.subject = loadTemplate(templateId + "-subject.ftl", preferredLanguages, "subject", baseResult);
+    parsedEmailTemplates.text = loadTemplate(templateId + "-text.ftl", preferredLanguages, "text", baseResult);
     return parsedEmailTemplates;
   }
 
   private Template loadTemplate(String templateName, List<Locale> preferredLanguages, String part,
-                                Map<String, ParseException> errors) {
+                                BaseResult baseResult) {
     if (preferredLanguages == null || preferredLanguages.isEmpty()) {
       preferredLanguages = EMPTY_LOCALES;
     }
@@ -76,7 +68,7 @@ public class FileSystemEmailTemplateLoader extends BaseEmailTemplateLoader {
       try {
         return freeMarkerConfiguration.getTemplate(templatesLocation + "/" + templateName, preferredLanguage);
       } catch (ParseException e) {
-        errors.put(part, e);
+        baseResult.parseErrors.put(part, e);
         return null;
       } catch (IOException e) {
         // Skip it and continue

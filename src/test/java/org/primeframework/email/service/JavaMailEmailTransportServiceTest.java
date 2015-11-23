@@ -17,15 +17,16 @@ package org.primeframework.email.service;
 
 import javax.mail.Session;
 import java.util.Properties;
-import java.util.concurrent.Future;
 
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.SendResult;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * This class tests the JavaMailEmailTransportService.
@@ -51,7 +52,7 @@ public class JavaMailEmailTransportServiceTest {
   }
 
   @Test
-  public void sendEmail() {
+  public void sendEmail() throws Exception {
     JavaMailEmailTransportService service = new JavaMailEmailTransportService(session);
     Email email = new Email();
     email.from = new EmailAddress("james@inversoft.com");
@@ -60,14 +61,7 @@ public class JavaMailEmailTransportServiceTest {
     email.text = "text";
     email.html = "<html><body><h3>html</h3></body></html>";
 
-    try {
-      Future<Email> future = service.sendEmailLater(email);
-      assertNotNull(future);
-      future.get();
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail("Unable to send emails.  Are you running a SMTP server?  Try executing: sudo postfix start");
-    }
+    sendAndVerify(service, email);
   }
 
   @Test
@@ -81,12 +75,15 @@ public class JavaMailEmailTransportServiceTest {
     email.html = "<html><body><h3>html</h3></body></html>";
     email.attachments.add(new Attachment("test.txt", "text/plain", "Hello world".getBytes()));
 
-    try {
-      Future<Email> future = service.sendEmailLater(email);
-      assertNotNull(future);
-      future.get();
-    } catch (Exception e) {
-      fail("Unable to send emails.  Are you running a SMTP server?  Try executing: sudo postfix start");
-    }
+    sendAndVerify(service, email);
+  }
+
+  private void sendAndVerify(JavaMailEmailTransportService service, Email email) throws Exception {
+    SendResult sendResult = new SendResult(email);
+    service.sendEmailLater(email, sendResult);
+
+    assertNotNull(sendResult.future);
+    assertSame(sendResult.future.get(), sendResult);
+    assertTrue(sendResult.future.get().wasSuccessful());
   }
 }

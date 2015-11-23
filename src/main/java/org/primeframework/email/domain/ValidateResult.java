@@ -13,19 +13,12 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.email;
+package org.primeframework.email.domain;
 
 /**
- * A sub-class of EmailException that is thrown when emails lack necessary data to be sent.
+ * Stores the result data when emails are validated.
  *
  * @author Brian Pontarelli
  */
-public class EmailDataException extends EmailException {
-  public EmailDataException(String message) {
-    super(message);
-  }
-
-  public EmailDataException(String message, Throwable cause) {
-    super(message, cause);
-  }
+public class ValidateResult extends BaseResult {
 }

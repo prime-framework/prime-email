@@ -18,10 +18,10 @@ package org.primeframework.email.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.function.Function;
 
 import org.primeframework.email.domain.Attachment;
+import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import static java.util.Arrays.asList;
@@ -30,16 +30,15 @@ import static java.util.Arrays.asList;
  * Builds the email information using a builder pattern. Anything specified via the builder overrides data in the
  * EmailTemplate.
  */
-public class EmailBuilder {
-  private final Email email;
+@SuppressWarnings("unchecked")
+public abstract class BaseEmailBuilder<T extends BaseEmailBuilder<T, U>, U extends BaseResult> {
+  protected final Email email;
 
-  private final Function<EmailBuilder, Future<Email>> laterFunction;
+  protected final Function<T, U> nowFunction;
 
-  private final Function<EmailBuilder, Email> nowFunction;
+  protected final Map<String, Object> params = new HashMap<>();
 
-  private final Map<String, Object> params = new HashMap<>();
-
-  private final Object templateId;
+  protected final Object templateId;
 
   /**
    * Constructs a new instance.
@@ -48,72 +47,70 @@ public class EmailBuilder {
    * @param email       The email from the configuration.
    * @param nowFunction The function to call when emails are sent now.
    */
-  EmailBuilder(Object templateId, Email email, Function<EmailBuilder, Future<Email>> laterFunction,
-               Function<EmailBuilder, Email> nowFunction) {
+  BaseEmailBuilder(Object templateId, Email email, Function<T, U> nowFunction) {
     this.templateId = templateId;
     this.email = email;
-    this.laterFunction = laterFunction;
     this.nowFunction = nowFunction;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder bcc(EmailAddress... bccEmails) {
+  public T bcc(EmailAddress... bccEmails) {
     email.bcc = asList(bccEmails);
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder bcc(String... bcc) {
+  public T bcc(String... bcc) {
     for (String s : bcc) {
       email.bcc.add(new EmailAddress(s));
     }
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder cc(EmailAddress... ccEmails) {
+  public T cc(EmailAddress... ccEmails) {
     email.cc = asList(ccEmails);
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder cc(String... cc) {
+  public T cc(String... cc) {
     for (String s : cc) {
       email.cc.add(new EmailAddress(s));
     }
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder from(EmailAddress fromEmail) {
+  public T from(EmailAddress fromEmail) {
     email.from = fromEmail;
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder from(String from) {
+  public T from(String from) {
     email.from = new EmailAddress(from);
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder from(String from, String display) {
+  public T from(String from, String display) {
     email.from = new EmailAddress(from, display);
-    return this;
+    return (T) this;
   }
 
   /**
@@ -154,7 +151,7 @@ public class EmailBuilder {
   /**
    * {@inheritDoc}
    */
-  public Map<String, Object> getParams() {
+  public Map<String, Object> getParameters() {
     return params;
   }
 
@@ -196,85 +193,71 @@ public class EmailBuilder {
   /**
    * {@inheritDoc}
    */
-  public Future<Email> later() {
-    return laterFunction.apply(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public Email now() {
-    return nowFunction.apply(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public EmailBuilder replyTo(EmailAddress replyTo) {
+  public T replyTo(EmailAddress replyTo) {
     email.replyTo = replyTo;
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder replyTo(String replyTo) {
+  public T replyTo(String replyTo) {
     email.replyTo = new EmailAddress(replyTo);
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder replyTo(String replyTo, String display) {
+  public T replyTo(String replyTo, String display) {
     email.replyTo = new EmailAddress(replyTo, display);
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder to(EmailAddress... to) {
+  public T to(EmailAddress... to) {
     email.to = asList(to);
-    return this;
+    return (T) this;
   }
 
-  public EmailBuilder to(String... to) {
+  public T to(String... to) {
     for (String s : to) {
       email.to.add(new EmailAddress(s));
     }
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder withAttachments(Attachment... attachments) {
+  public T withAttachments(Attachment... attachments) {
     email.attachments = asList(attachments);
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder withSubject(String subject) {
+  public T withSubject(String subject) {
     email.subject = subject;
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder withTemplateParameter(String name, Object value) {
+  public T withTemplateParameter(String name, Object value) {
     params.put(name, value);
-    return this;
+    return (T) this;
   }
 
   /**
    * {@inheritDoc}
    */
-  public EmailBuilder withTemplateParameters(Map<String, Object> params) {
+  public T withTemplateParameters(Map<String, Object> params) {
     this.params.putAll(params);
-    return this;
+    return (T) this;
   }
 }

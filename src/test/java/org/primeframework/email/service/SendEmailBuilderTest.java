@@ -20,22 +20,22 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * This class tests the email command.
+ * This class tests the email builder.
  *
  * @author James Humphrey
  */
 @Test(groups = "unit")
-public class EmailBuilderImplTest {
+public class SendEmailBuilderTest {
   @Test
   public void subjectExplicit() {
-    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
+    SendEmailBuilder eb = new SendEmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
     eb.withSubject("test subject");
     assertEquals(eb.getSubject(), "test subject");
   }
 
   @Test
   public void templateParams() {
-    EmailBuilder eb = new EmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
+    SendEmailBuilder eb = new SendEmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
     eb = eb.withTemplateParameter("key1", "value1").withTemplateParameter("key2", "value2");
 
     assertEquals(eb.getTemplateParams().size(), 2);

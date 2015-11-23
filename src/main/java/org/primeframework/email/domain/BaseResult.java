@@ -13,43 +13,33 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.email;
+package org.primeframework.email.domain;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import freemarker.core.ParseException;
 import freemarker.template.TemplateException;
-import org.primeframework.email.domain.Email;
 
 /**
- * A sub-class of EmailException that is thrown when email templates have failures.
+ * Stores the common result data for preview, send and validate requests.
  *
  * @author Brian Pontarelli
  */
-public class EmailTemplateException extends EmailException {
-  private final Email email;
+public abstract class BaseResult {
+  public final Map<String, ParseException> parseErrors = new HashMap<>();
 
-  private final Map<String, ParseException> parseErrors = new HashMap<>();
+  public final Map<String, TemplateException> renderErrors = new HashMap<>();
 
-  private final Map<String, TemplateException> renderErrors = new HashMap<>();
+  public BaseResult() {
+  }
 
-  public EmailTemplateException(Email email, Map<String, ParseException> parseErrors,
-                                Map<String, TemplateException> renderErrors) {
-    this.email = email;
+  public BaseResult(Map<String, ParseException> parseErrors, Map<String, TemplateException> renderErrors) {
     this.parseErrors.putAll(parseErrors);
     this.renderErrors.putAll(renderErrors);
   }
 
-  public Email getEmail() {
-    return email;
-  }
-
-  public Map<String, ParseException> getParseErrors() {
-    return parseErrors;
-  }
-
-  public Map<String, TemplateException> getRenderErrors() {
-    return renderErrors;
+  public boolean wasSuccessful() {
+    return parseErrors.isEmpty() && renderErrors.isEmpty();
   }
 }

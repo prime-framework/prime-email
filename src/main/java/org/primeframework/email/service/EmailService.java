@@ -19,9 +19,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.primeframework.email.EmailException;
-import org.primeframework.email.EmailTemplateException;
 import org.primeframework.email.domain.RawEmailTemplates;
+import org.primeframework.email.domain.ValidateResult;
 
 /**
  * This interface defines how to send emails in a simple and templatized manner.
@@ -30,9 +29,8 @@ import org.primeframework.email.domain.RawEmailTemplates;
  */
 public interface EmailService {
   /**
-   * Builds a preview of an email using raw templates. These templates are passed in rather than loaded using the
-   * {@link EmailTemplateLoader}.
-   * etc.
+   * Builds a preview of an email using raw templates. These templates are passed in rather than loaded using the {@link
+   * EmailTemplateLoader}. etc.
    * <p>
    * Here's an example using this method:
    * <p>
@@ -49,9 +47,8 @@ public interface EmailService {
    *
    * @param rawEmailTemplates (Required) The un-rendered email template.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
-   * @throws EmailTemplateException If there were are errors while building the preview.
    */
-  EmailBuilder preview(RawEmailTemplates rawEmailTemplates) throws EmailTemplateException;
+  PreviewEmailBuilder preview(RawEmailTemplates rawEmailTemplates);
 
   /**
    * Builds a preview of an email using the templateId that is loaded via the {@link EmailTemplateLoader}. Once the
@@ -81,13 +78,12 @@ public interface EmailService {
    *                           and how they are stored.
    * @param preferredLanguages The preferred languages to send them email in.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
-   * @throws EmailException Sub-classes of this are thrown when the rendering building fails.
    */
-  EmailBuilder preview(Object templateId, List<Locale> preferredLanguages) throws EmailException;
+  PreviewEmailBuilder preview(Object templateId, List<Locale> preferredLanguages);
 
   /**
    * Sends an email using the email template loaded by passing the templateId to the {@link EmailTemplateLoader}. Once
-   * the template is loaded, it is rendered and combine with the data from the {@link EmailBuilder}.
+   * the template is loaded, it is rendered and combine with the data from the {@link BaseEmailBuilder}.
    * <p>
    * Here's an example using the template below named 'hello':
    * <p>
@@ -111,9 +107,8 @@ public interface EmailService {
    *                           and how they are stored.
    * @param preferredLanguages The preferred languages to send them email in.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
-   * @throws EmailException Sub-classes of this are thrown when the sending fails.
    */
-  EmailBuilder send(Object templateId, List<Locale> preferredLanguages) throws EmailException;
+  SendEmailBuilder send(Object templateId, List<Locale> preferredLanguages);
 
   /**
    * Validates multiple FreeMarker templates. This will throw an EmailTemplateException that contains all of the errors
@@ -137,8 +132,8 @@ public interface EmailService {
    * </pre>
    *
    * @param rawEmailTemplates (Required) The templates to validate.
-   * @param parameters     (Required) The parameters used to render the template.
-   * @throws EmailTemplateException If there are any errors.
+   * @param parameters        (Required) The parameters used to render the template.
+   * @return The ValidateResult which contains any errors that were found.
    */
-  void validate(RawEmailTemplates rawEmailTemplates, Map<String, Object> parameters) throws EmailTemplateException;
+  ValidateResult validate(RawEmailTemplates rawEmailTemplates, Map<String, Object> parameters);
 }

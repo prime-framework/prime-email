@@ -13,15 +13,29 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-package org.primeframework.email;
+package org.primeframework.email.domain;
+
+import java.util.Map;
+
+import freemarker.core.ParseException;
+import freemarker.template.TemplateException;
 
 /**
- * A sub-class of EmailException that is thrown when sending an email fails.
+ * Stores the result data when emails are previewed.
  *
  * @author Brian Pontarelli
  */
-public class EmailTransportException extends EmailException {
-  public EmailTransportException(String message, Throwable cause) {
-    super(message, cause);
+public class PreviewResult extends BaseResult {
+  public Email email;
+
+  public PreviewResult() {
+  }
+
+  public PreviewResult(Email email) {
+    this.email = email;
+  }
+
+  public PreviewResult(Map<String, ParseException> parseErrors, Map<String, TemplateException> renderErrors) {
+    super(parseErrors, renderErrors);
   }
 }

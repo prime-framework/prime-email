@@ -17,18 +17,15 @@ package org.primeframework.email.service;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Map;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.primeframework.email.EmailException;
-import org.primeframework.email.EmailTemplateException;
+import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import org.primeframework.email.domain.ParsedEmailAddress;
 import org.primeframework.email.domain.ParsedEmailTemplates;
-import static java.util.Collections.emptyMap;
 
 /**
  * An implementation of the email template loader that loads FreeMarker templates from the file system. The location of
@@ -38,36 +35,30 @@ import static java.util.Collections.emptyMap;
  */
 public class FreeMarkerEmailRenderer implements EmailRenderer {
   @Override
-  public void render(ParsedEmailTemplates parsedEmailTemplates, Email email, Map<String, Object> parameters)
-      throws EmailTemplateException {
-    Map<String, TemplateException> renderErrors = new HashMap<>();
-
+  public void render(ParsedEmailTemplates parsedEmailTemplates, Email email, Map<String, Object> parameters,
+                     BaseResult baseResult) {
     if (email.from == null && parsedEmailTemplates.from != null) {
-      email.from = renderEmailAddress(parsedEmailTemplates.from, parameters, "from", renderErrors);
+      email.from = renderEmailAddress(parsedEmailTemplates.from, parameters, "from", baseResult);
     }
 
-    parsedEmailTemplates.bcc.forEach((bcc) -> email.bcc.add(renderEmailAddress(bcc, parameters, "bcc", renderErrors)));
-    parsedEmailTemplates.cc.forEach((cc) -> email.bcc.add(renderEmailAddress(cc, parameters, "cc", renderErrors)));
-    parsedEmailTemplates.to.forEach((to) -> email.bcc.add(renderEmailAddress(to, parameters, "to", renderErrors)));
+    parsedEmailTemplates.bcc.forEach((bcc) -> email.bcc.add(renderEmailAddress(bcc, parameters, "bcc", baseResult)));
+    parsedEmailTemplates.cc.forEach((cc) -> email.bcc.add(renderEmailAddress(cc, parameters, "cc", baseResult)));
+    parsedEmailTemplates.to.forEach((to) -> email.bcc.add(renderEmailAddress(to, parameters, "to", baseResult)));
 
     if (email.html == null && parsedEmailTemplates.html != null) {
-      email.html = callTemplate(parsedEmailTemplates.html, parameters, "html", renderErrors);
+      email.html = callTemplate(parsedEmailTemplates.html, parameters, "html", baseResult);
     }
 
     if (email.replyTo == null) {
-      email.replyTo = renderEmailAddress(parsedEmailTemplates.replyTo, parameters, "replyTo", renderErrors);
+      email.replyTo = renderEmailAddress(parsedEmailTemplates.replyTo, parameters, "replyTo", baseResult);
     }
 
     if (email.subject == null && parsedEmailTemplates.subject != null) {
-      email.subject = callTemplate(parsedEmailTemplates.subject, parameters, "subject", renderErrors);
+      email.subject = callTemplate(parsedEmailTemplates.subject, parameters, "subject", baseResult);
     }
 
     if (email.text == null && parsedEmailTemplates.text != null) {
-      email.text = callTemplate(parsedEmailTemplates.text, parameters, "text", renderErrors);
-    }
-
-    if (renderErrors.size() > 0) {
-      throw new EmailTemplateException(email, emptyMap(), renderErrors);
+      email.text = callTemplate(parsedEmailTemplates.text, parameters, "text", baseResult);
     }
   }
 
@@ -76,12 +67,11 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
    *
    * @param template   The FreeMaker template.
    * @param parameters The parameters that are passed to the template.
-   * @param errors     The errors map.
+   * @param baseResult The base result where errors are added.
    * @return The String result of the processing the template.
-   * @throws EmailException If the template couldn't be processed.
    */
   protected String callTemplate(Template template, Map<String, Object> parameters, String part,
-                                Map<String, TemplateException> errors) {
+                                BaseResult baseResult) {
     if (template == null) {
       return null;
     }
@@ -90,7 +80,7 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
     try {
       template.process(parameters, writer);
     } catch (TemplateException e) {
-      errors.put(part, e);
+      baseResult.renderErrors.put(part, e);
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }
@@ -99,9 +89,9 @@ public class FreeMarkerEmailRenderer implements EmailRenderer {
   }
 
   private EmailAddress renderEmailAddress(ParsedEmailAddress parsedEmailAddress, Map<String, Object> parameters,
-                                          String part, Map<String, TemplateException> errors) {
+                                          String part, BaseResult baseResult) {
     if (parsedEmailAddress != null) {
-      return new EmailAddress(parsedEmailAddress.address, callTemplate(parsedEmailAddress.display, parameters, part, errors));
+      return new EmailAddress(parsedEmailAddress.address, callTemplate(parsedEmailAddress.display, parameters, part, baseResult));
     }
 
     return null;
