@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2016, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.SendResult;
 import org.primeframework.email.service.EmailTransportService;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 
 /**
  * This class provides tests with the ability to setup email handling.
