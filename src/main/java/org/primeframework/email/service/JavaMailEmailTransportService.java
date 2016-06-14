@@ -35,6 +35,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
@@ -43,23 +44,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements the {@link EmailTransportService} interface using the JavaMail API and a JavaMail session.
+ * This class implements the {@link EmailTransportService} interface using the JavaMail API and a JavaMail sessionProvider.
  *
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
   private ExecutorService executorService;
 
-  private Session session;
+  private Provider<Session> sessionProvider;
 
   /**
    * Constructs the transport service.
    *
-   * @param session The Java mail session.
+   * @param sessionProvider The Java mail session provider.
    */
   @Inject
-  public JavaMailEmailTransportService(Session session) {
-    this.session = session;
+  public JavaMailEmailTransportService(Provider<Session> sessionProvider) {
+    this.sessionProvider = sessionProvider;
     this.executorService = Executors.newCachedThreadPool(
         (r) -> {
           Thread t = new Thread(r, "Prime-Email Executor Thread");
@@ -74,7 +75,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    */
   @Override
   public void sendEmail(Email email, SendResult sendResult) {
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult), session, sendResult);
+    Session session = sessionProvider.get();
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), session, sendResult);
     if (sendResult.wasSuccessful()) {
       runnable.run();
     }
@@ -82,7 +84,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
   @Override
   public void sendEmailLater(Email email, SendResult sendResult) {
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult), session, sendResult);
+    Session session = sessionProvider.get();
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), session, sendResult);
     if (sendResult.wasSuccessful()) {
       try {
         sendResult.future = executorService.submit(runnable, sendResult);
@@ -93,7 +96,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     }
   }
 
-  private Message message(Email email, SendResult sendResult) {
+  private Message message(Email email, SendResult sendResult, Session session) {
     Message message = new MimeMessage(session);
 
     try {

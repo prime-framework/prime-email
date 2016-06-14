@@ -38,7 +38,7 @@ public class JavaMailEmailTransportServiceTest {
   private static Session session;
 
   @BeforeClass
-  public static void setupJNDI() {
+  public static void setup() {
     // Set the auth
     Properties props = new Properties();
     props.setProperty("mail.smtp.host", "localhost");
@@ -53,7 +53,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmail() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(session);
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(() -> session);
     Email email = new Email();
     email.from = new EmailAddress("james@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
@@ -66,7 +66,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmailWithAttachments() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(session);
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(() -> session);
     Email email = new Email();
     email.from = new EmailAddress("brian@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
