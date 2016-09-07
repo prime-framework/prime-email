@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2016, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package org.primeframework.email.service;
 
-import javax.mail.Session;
-import java.util.Properties;
-
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import org.primeframework.email.domain.SendResult;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import javax.mail.Session;
+import java.util.Properties;
+
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
@@ -55,7 +56,7 @@ public class JavaMailEmailTransportServiceTest {
   public void sendEmail() throws Exception {
     JavaMailEmailTransportService service = new JavaMailEmailTransportService(() -> session);
     Email email = new Email();
-    email.from = new EmailAddress("james@inversoft.com");
+    email.from = new EmailAddress("dev@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
     email.subject = "Test email";
     email.text = "text";

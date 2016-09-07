@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2016, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,15 @@
  * language governing permissions and limitations under the License.
  */
 package org.primeframework.email.service;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import org.primeframework.email.domain.Attachment;
+import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.SendResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -33,15 +42,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import org.primeframework.email.domain.Attachment;
-import org.primeframework.email.domain.Email;
-import org.primeframework.email.domain.EmailAddress;
-import org.primeframework.email.domain.SendResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the {@link EmailTransportService} interface using the JavaMail API and a JavaMail sessionProvider.
@@ -76,7 +76,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   @Override
   public void sendEmail(Email email, SendResult sendResult) {
     Session session = sessionProvider.get();
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), session, sendResult);
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult);
     if (sendResult.wasSuccessful()) {
       runnable.run();
     }
@@ -85,7 +85,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   @Override
   public void sendEmailLater(Email email, SendResult sendResult) {
     Session session = sessionProvider.get();
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), session, sendResult);
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult);
     if (sendResult.wasSuccessful()) {
       try {
         sendResult.future = executorService.submit(runnable, sendResult);
@@ -195,23 +195,15 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
     private final SendResult sendResult;
 
-    private final Session session;
-
-    public EmailRunnable(Message message, Session session, SendResult sendResult) {
+    public EmailRunnable(Message message, SendResult sendResult) {
       this.message = message;
-      this.session = session;
       this.sendResult = sendResult;
     }
 
     public void run() {
       try {
         logger.debug("Sending mail to JavaMail API");
-
-        Transport transport = session.getTransport();
-        transport.connect();
-        transport.sendMessage(message, message.getAllRecipients());
-        transport.close();
-
+        Transport.send(message);
         logger.debug("Finished JavaMail send");
       } catch (MessagingException e) {
         logger.error("Unable to send email via JavaMail", e);
