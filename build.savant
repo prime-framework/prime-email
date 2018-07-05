@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2016, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2018, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
  * either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */
-savantVersion = "0.4.4"
+savantVersion = "1.0.0"
 
-project(group: "org.primeframework", name: "prime-email", version: "0.13.1", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-email", version: "0.13.2", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -29,9 +29,9 @@ project(group: "org.primeframework", name: "prime-email", version: "0.13.1", lic
       dependency(id: "javax.mail:mail:1.4.4")
     }
     group(name: "compile") {
-      dependency(id: "com.google.inject:guice:4.0.0")
+      dependency(id: "com.google.inject:guice:4.2.0")
       dependency(id: "javax.inject:javax.inject:1.0.0")
-      dependency(id: "org.freemarker:freemarker:2.3.23")
+      dependency(id: "org.freemarker:freemarker:2.3.28")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")
     }
     group(name: "test-compile", export: false) {
@@ -46,9 +46,9 @@ project(group: "org.primeframework", name: "prime-email", version: "0.13.1", lic
 }
 
 // Plugins
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:${savantVersion}")
-java = loadPlugin(id: "org.savantbuild.plugin:java:${savantVersion}")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:${savantVersion}")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:1.0.2")
+java = loadPlugin(id: "org.savantbuild.plugin:java:1.0.2")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:1.0.2")
 idea = loadPlugin(id: "org.savantbuild.plugin:idea:${savantVersion}")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 

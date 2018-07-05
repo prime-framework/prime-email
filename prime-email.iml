@@ -6,6 +6,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="" />
         <datasource-mapping>
+          <factory-entry name="Entities" />
           <factory-entry name="punit" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/conf/test/META-INF/persistence.xml" />
@@ -48,11 +49,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.0.0/guice-4.0.0.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.2.0/guice-4.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.0.0/guice-4.0.0-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/4.2.0/guice-4.2.0-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -70,11 +71,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.23/freemarker-2.3.23.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.28/freemarker-2.3.28.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.23/freemarker-2.3.23-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/org/freemarker/freemarker/2.3.28/freemarker-2.3.28-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -147,23 +148,76 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/16.0.1/guava-16.0.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/16.0.1/guava-16.0.1-src.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="RUNTIME">
-      <library>
-        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/org/aopalliance/aopalliance/1.0.0/aopalliance-1.0.0-src.jar!/" />
         </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/23.6.0+android/guava-23.6.0+android.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/23.6.0+android/guava-23.6.0+android-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/checkerframework/checker-compat-qual/2.0.0/checker-compat-qual-2.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/checkerframework/checker-compat-qual/2.0.0/checker-compat-qual-2.0.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/codehaus/mojo/animal-sniffer-annotations/1.14.0/animal-sniffer-annotations-1.14.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/org/codehaus/mojo/animal-sniffer-annotations/1.14.0/animal-sniffer-annotations-1.14.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/errorprone/error_prone_annotations/2.1.3/error_prone_annotations-2.1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/errorprone/error_prone_annotations/2.1.3/error_prone_annotations-2.1.3-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/j2objc/j2objc-annotations/1.1.0/j2objc-annotations-1.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/j2objc/j2objc-annotations/1.1.0/j2objc-annotations-1.1.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

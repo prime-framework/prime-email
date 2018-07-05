@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2018, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,9 +62,9 @@ public class DefaultEmailServiceTest {
 
   @BeforeMethod
   public void beforeMethod() throws Exception {
-    DefaultObjectWrapper wrapper = new DefaultObjectWrapper(Configuration.VERSION_2_3_23);
+    DefaultObjectWrapper wrapper = new DefaultObjectWrapper(Configuration.VERSION_2_3_28);
     wrapper.setExposeFields(true);
-    config = new Configuration(Configuration.VERSION_2_3_23);
+    config = new Configuration(Configuration.VERSION_2_3_28);
     config.setObjectWrapper(wrapper);
     config.setTemplateLoader(new FileTemplateLoader(new File("src/test/resources")));
 
