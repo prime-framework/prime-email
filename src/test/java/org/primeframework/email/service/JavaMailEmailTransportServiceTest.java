@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2019, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmail() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(() -> session);
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), () -> session);
     Email email = new Email();
     email.from = new EmailAddress("dev@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
@@ -67,7 +67,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmailWithAttachments() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(() -> session);
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), () -> session);
     Email email = new Email();
     email.from = new EmailAddress("brian@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));

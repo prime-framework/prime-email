@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2016, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2019, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ import java.util.concurrent.RejectedExecutionException;
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
+  private final MessagingExceptionHandler messagingExceptionHandler;
   private ExecutorService executorService;
-
   private Provider<Session> sessionProvider;
 
   /**
@@ -59,7 +59,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    * @param sessionProvider The Java mail session provider.
    */
   @Inject
-  public JavaMailEmailTransportService(Provider<Session> sessionProvider) {
+  public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler, Provider<Session> sessionProvider) {
+    this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
     this.executorService = Executors.newCachedThreadPool(
         (r) -> {
@@ -76,7 +77,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   @Override
   public void sendEmail(Email email, SendResult sendResult) {
     Session session = sessionProvider.get();
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult);
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       runnable.run();
     }
@@ -85,7 +86,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   @Override
   public void sendEmailLater(Email email, SendResult sendResult) {
     Session session = sessionProvider.get();
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult);
+    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
         sendResult.future = executorService.submit(runnable, sendResult);
@@ -195,8 +196,11 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
     private final SendResult sendResult;
 
-    public EmailRunnable(Message message, SendResult sendResult) {
+    private final MessagingExceptionHandler messagingExceptionHandler;
+
+    public EmailRunnable(Message message, SendResult sendResult, MessagingExceptionHandler messagingExceptionHandler) {
       this.message = message;
+      this.messagingExceptionHandler = messagingExceptionHandler;
       this.sendResult = sendResult;
     }
 
@@ -206,7 +210,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
         Transport.send(message);
         logger.debug("Finished JavaMail send");
       } catch (MessagingException e) {
-        logger.error("Unable to send email via JavaMail", e);
+        messagingExceptionHandler.handle(e);
         sendResult.transportError = "Unable to send email via JavaMail";
       }
     }
