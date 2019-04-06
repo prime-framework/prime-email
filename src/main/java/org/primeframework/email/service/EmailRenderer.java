@@ -15,11 +15,11 @@
  */
 package org.primeframework.email.service;
 
-import java.util.Map;
-
 import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.ParsedEmailTemplates;
+
+import java.util.Map;
 
 /**
  * Loads email templates and renders them.

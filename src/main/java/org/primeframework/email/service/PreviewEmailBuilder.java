@@ -15,10 +15,10 @@
  */
 package org.primeframework.email.service;
 
-import java.util.function.Function;
-
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.PreviewResult;
+
+import java.util.function.Function;
 
 /**
  * Builds the email information using a builder pattern. Anything specified via the builder overrides data in the

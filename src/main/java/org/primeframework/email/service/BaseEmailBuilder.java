@@ -15,15 +15,16 @@
  */
 package org.primeframework.email.service;
 
+import org.primeframework.email.domain.Attachment;
+import org.primeframework.email.domain.BaseResult;
+import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.EmailAddress;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.primeframework.email.domain.Attachment;
-import org.primeframework.email.domain.BaseResult;
-import org.primeframework.email.domain.Email;
-import org.primeframework.email.domain.EmailAddress;
 import static java.util.Arrays.asList;
 
 /**

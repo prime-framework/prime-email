@@ -15,10 +15,6 @@
  */
 package org.primeframework.email.service;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import com.google.inject.Inject;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.ParsedEmailTemplates;
@@ -26,6 +22,10 @@ import org.primeframework.email.domain.PreviewResult;
 import org.primeframework.email.domain.RawEmailTemplates;
 import org.primeframework.email.domain.SendResult;
 import org.primeframework.email.domain.ValidateResult;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * This class implements the {@link EmailService} interface controls the flow of configuring the emails. The {@link

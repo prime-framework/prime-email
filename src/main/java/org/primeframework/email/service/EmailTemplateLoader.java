@@ -15,13 +15,13 @@
  */
 package org.primeframework.email.service;
 
-import java.util.List;
-import java.util.Locale;
-
 import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.ParsedEmailTemplates;
 import org.primeframework.email.domain.RawEmailTemplates;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Loads templates and localizes the templates into the template fields inside an {@link Email} object.

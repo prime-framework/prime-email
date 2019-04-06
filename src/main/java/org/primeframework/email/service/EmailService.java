@@ -15,12 +15,12 @@
  */
 package org.primeframework.email.service;
 
+import org.primeframework.email.domain.RawEmailTemplates;
+import org.primeframework.email.domain.ValidateResult;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import org.primeframework.email.domain.RawEmailTemplates;
-import org.primeframework.email.domain.ValidateResult;
 
 /**
  * This interface defines how to send emails in a simple and templatized manner.

@@ -15,10 +15,6 @@
  */
 package org.primeframework.email.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
 import com.google.inject.Inject;
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;
@@ -27,6 +23,11 @@ import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.ParsedEmailAddress;
 import org.primeframework.email.domain.ParsedEmailTemplates;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import static java.util.Collections.singletonList;
 
 /**

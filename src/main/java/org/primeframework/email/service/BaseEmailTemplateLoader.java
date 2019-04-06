@@ -15,8 +15,6 @@
  */
 package org.primeframework.email.service;
 
-import java.io.IOException;
-
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -24,6 +22,8 @@ import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.ParsedEmailAddress;
 import org.primeframework.email.domain.ParsedEmailTemplates;
 import org.primeframework.email.domain.RawEmailTemplates;
+
+import java.io.IOException;
 
 /**
  * @author Brian Pontarelli

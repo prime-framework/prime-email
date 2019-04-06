@@ -15,10 +15,6 @@
  */
 package org.primeframework.email.service;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
-
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.primeframework.email.domain.BaseResult;
@@ -26,6 +22,10 @@ import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import org.primeframework.email.domain.ParsedEmailAddress;
 import org.primeframework.email.domain.ParsedEmailTemplates;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
 
 /**
  * An implementation of the email template loader that loads FreeMarker templates from the file system. The location of
