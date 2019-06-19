@@ -15,15 +15,6 @@
  */
 package org.primeframework.email.service;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import org.primeframework.email.domain.Attachment;
-import org.primeframework.email.domain.Email;
-import org.primeframework.email.domain.EmailAddress;
-import org.primeframework.email.domain.SendResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.BodyPart;
@@ -43,15 +34,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
+import com.google.inject.Inject;
+import org.primeframework.email.domain.Attachment;
+import org.primeframework.email.domain.Email;
+import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.SendResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * This class implements the {@link EmailTransportService} interface using the JavaMail API and a JavaMail sessionProvider.
+ * This class implements the {@link EmailTransportService} interface using the JavaMail API and a JavaMail
+ * sessionProvider.
  *
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
   private final MessagingExceptionHandler messagingExceptionHandler;
+
   private ExecutorService executorService;
-  private Provider<Session> sessionProvider;
+
+  private JavaMailSessionProvider sessionProvider;
 
   /**
    * Constructs the transport service.
@@ -59,7 +61,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    * @param sessionProvider The Java mail session provider.
    */
   @Inject
-  public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler, Provider<Session> sessionProvider) {
+  public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler,
+                                       JavaMailSessionProvider sessionProvider) {
     this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
     this.executorService = Executors.newCachedThreadPool(
@@ -75,8 +78,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    * {@inheritDoc}
    */
   @Override
-  public void sendEmail(Email email, SendResult sendResult) {
-    Session session = sessionProvider.get();
+  public void sendEmail(Object contextId, Email email, SendResult sendResult) {
+    Session session = sessionProvider.get(contextId);
     EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       runnable.run();
@@ -84,8 +87,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   }
 
   @Override
-  public void sendEmailLater(Email email, SendResult sendResult) {
-    Session session = sessionProvider.get();
+  public void sendEmailLater(Object contextId, Email email, SendResult sendResult) {
+    Session session = sessionProvider.get(contextId);
     EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
@@ -194,9 +197,9 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
     private final Message message;
 
-    private final SendResult sendResult;
-
     private final MessagingExceptionHandler messagingExceptionHandler;
+
+    private final SendResult sendResult;
 
     public EmailRunnable(Message message, SendResult sendResult, MessagingExceptionHandler messagingExceptionHandler) {
       this.message = message;

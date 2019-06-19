@@ -15,12 +15,12 @@
  */
 package org.primeframework.email.service;
 
-import org.primeframework.email.domain.RawEmailTemplates;
-import org.primeframework.email.domain.ValidateResult;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.primeframework.email.domain.RawEmailTemplates;
+import org.primeframework.email.domain.ValidateResult;
 
 /**
  * This interface defines how to send emails in a simple and templatized manner.
@@ -45,10 +45,11 @@ public interface EmailService {
    * System.out.println(email.text);
    * </pre>
    *
+   * @param contextId         The context id that helps determine how the email is processed.
    * @param rawEmailTemplates (Required) The un-rendered email template.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
    */
-  PreviewEmailBuilder preview(RawEmailTemplates rawEmailTemplates);
+  PreviewEmailBuilder preview(Object contextId, RawEmailTemplates rawEmailTemplates);
 
   /**
    * Builds a preview of an email using the templateId that is loaded via the {@link EmailTemplateLoader}. Once the
@@ -74,12 +75,13 @@ public interface EmailService {
    * System.out.println(email.html);
    * </pre>
    *
+   * @param contextId          The context id that helps determine how the email is processed.
    * @param templateId         (Required) The id of the template. The implementation will dictate the type of template
    *                           and how they are stored.
    * @param preferredLanguages The preferred languages to send them email in.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
    */
-  PreviewEmailBuilder preview(Object templateId, List<Locale> preferredLanguages);
+  PreviewEmailBuilder preview(Object contextId, Object templateId, List<Locale> preferredLanguages);
 
   /**
    * Sends an email using the email template loaded by passing the templateId to the {@link EmailTemplateLoader}. Once
@@ -103,12 +105,13 @@ public interface EmailService {
    *             .now();
    * </pre>
    *
+   * @param contextId          The context id that helps determine how the email is processed.
    * @param templateId         (Required) The id of the template. The implementation will dictate the type of template
    *                           and how they are stored.
    * @param preferredLanguages The preferred languages to send them email in.
    * @return The EmailBuilder that is used to build up the email configuration and parameters.
    */
-  SendEmailBuilder send(Object templateId, List<Locale> preferredLanguages);
+  SendEmailBuilder send(Object contextId, Object templateId, List<Locale> preferredLanguages);
 
   /**
    * Validates multiple FreeMarker templates. This will throw an EmailTemplateException that contains all of the errors
@@ -131,9 +134,10 @@ public interface EmailService {
    * }
    * </pre>
    *
+   * @param contextId         The context id that helps determine how the email is processed.
    * @param rawEmailTemplates (Required) The templates to validate.
    * @param parameters        (Required) The parameters used to render the template.
    * @return The ValidateResult which contains any errors that were found.
    */
-  ValidateResult validate(RawEmailTemplates rawEmailTemplates, Map<String, Object> parameters);
+  ValidateResult validate(Object contextId, RawEmailTemplates rawEmailTemplates, Map<String, Object> parameters);
 }

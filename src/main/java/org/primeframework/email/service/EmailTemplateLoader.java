@@ -15,13 +15,13 @@
  */
 package org.primeframework.email.service;
 
+import java.util.List;
+import java.util.Locale;
+
 import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.ParsedEmailTemplates;
 import org.primeframework.email.domain.RawEmailTemplates;
-
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Loads templates and localizes the templates into the template fields inside an {@link Email} object.
@@ -32,12 +32,14 @@ public interface EmailTemplateLoader {
   /**
    * Loads an existing set of templates for an email.
    *
+   * @param contextId          The context id that helps determine how the email is processed.
    * @param templateId         The id of the template to load.
    * @param preferredLanguages The preferred langauges that can be used to localize the templates.
    * @param baseResult         The base result that errors are added to.
    * @return The parsed email templates.
    */
-  ParsedEmailTemplates load(Object templateId, List<Locale> preferredLanguages, BaseResult baseResult);
+  ParsedEmailTemplates load(Object contextId, Object templateId, List<Locale> preferredLanguages,
+                            BaseResult baseResult);
 
   /**
    * Parses the templates using FreeMarker.

@@ -27,17 +27,19 @@ public interface EmailTransportService {
   /**
    * Sends an email using some SMTP transport mechanism. This sends the email immediately.
    *
+   * @param contextId  The context id that helps determine how the email is processed.
    * @param email      The email to send.
    * @param sendResult The send result where errors and emails are stored.
    */
-  void sendEmail(Email email, SendResult sendResult);
+  void sendEmail(Object contextId, Email email, SendResult sendResult);
 
   /**
    * Sends an email using some SMTP transport mechanism. This will always send the message asynchronously and return
    * control immediately to the caller.
    *
+   * @param contextId  The context id that helps determine how the email is processed.
    * @param email      The email to send.
    * @param sendResult The send result where errors and emails are stored.
    */
-  void sendEmailLater(Email email, SendResult sendResult);
+  void sendEmailLater(Object contextId, Email email, SendResult sendResult);
 }

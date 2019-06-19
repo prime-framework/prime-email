@@ -15,16 +15,15 @@
  */
 package org.primeframework.email.service;
 
+import javax.mail.Session;
+import java.util.Properties;
+
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import org.primeframework.email.domain.SendResult;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import javax.mail.Session;
-import java.util.Properties;
-
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
@@ -54,7 +53,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmail() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), () -> session);
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
     Email email = new Email();
     email.from = new EmailAddress("dev@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
@@ -67,7 +66,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmailWithAttachments() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), () -> session);
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
     Email email = new Email();
     email.from = new EmailAddress("brian@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
@@ -81,10 +80,23 @@ public class JavaMailEmailTransportServiceTest {
 
   private void sendAndVerify(JavaMailEmailTransportService service, Email email) throws Exception {
     SendResult sendResult = new SendResult(email);
-    service.sendEmailLater(email, sendResult);
+    service.sendEmailLater(null, email, sendResult);
 
     assertNotNull(sendResult.future);
     assertSame(sendResult.future.get(), sendResult);
     assertTrue(sendResult.future.get().wasSuccessful());
+  }
+
+  public static class TestJavaMailSessionProvider implements JavaMailSessionProvider {
+    private final Session session;
+
+    TestJavaMailSessionProvider(Session session) {
+      this.session = session;
+    }
+
+    @Override
+    public Session get(Object contextId) {
+      return session;
+    }
   }
 }

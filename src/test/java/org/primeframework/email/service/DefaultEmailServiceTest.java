@@ -51,7 +51,7 @@ import static org.testng.Assert.assertTrue;
  */
 @Test(groups = "unit")
 public class DefaultEmailServiceTest {
-  public Configuration config;
+  private Configuration config;
 
   private Path templatePath = Paths.get("src/test/resources/templates");
 
@@ -72,9 +72,9 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void preview_existing_badParse() throws Exception {
+  public void preview_existing_badParse() {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
-    PreviewResult result = service.preview("bad-parse-template", singletonList(Locale.US))
+    PreviewResult result = service.preview(null, "bad-parse-template", singletonList(Locale.US))
                                   .cc(new EmailAddress("from@example.com"))
                                   .bcc(new EmailAddress("from@example.com"))
                                   .withSubject("test subject")
@@ -89,9 +89,9 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void preview_existing_badRender() throws Exception {
+  public void preview_existing_badRender() {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
-    PreviewResult result = service.preview("bad-render-template", singletonList(Locale.US))
+    PreviewResult result = service.preview(null, "bad-render-template", singletonList(Locale.US))
                                   .cc(new EmailAddress("from@example.com"))
                                   .bcc(new EmailAddress("from@example.com"))
                                   .withSubject("test subject")
@@ -109,7 +109,7 @@ public class DefaultEmailServiceTest {
   public void preview_partBad_partGood() throws Exception {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
     RawEmailTemplates rawEmailTemplates = loadRaw(templatePath.resolve("bad-render-template-text.ftl"), templatePath.resolve("test-template-html.ftl"));
-    PreviewResult result = service.preview(rawEmailTemplates)
+    PreviewResult result = service.preview(null, rawEmailTemplates)
                                   .cc(new EmailAddress("from@example.com"))
                                   .bcc(new EmailAddress("from@example.com"))
                                   .withSubject("test subject")
@@ -129,7 +129,7 @@ public class DefaultEmailServiceTest {
   public void preview_raw_badParse() throws Exception {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
     RawEmailTemplates rawEmailTemplates = loadRaw(templatePath.resolve("bad-parse-template-text.ftl"), templatePath.resolve("bad-parse-template-html.ftl"));
-    PreviewResult result = service.preview(rawEmailTemplates)
+    PreviewResult result = service.preview(null, rawEmailTemplates)
                                   .cc(new EmailAddress("from@example.com"))
                                   .bcc(new EmailAddress("from@example.com"))
                                   .withSubject("test subject")
@@ -147,7 +147,7 @@ public class DefaultEmailServiceTest {
   public void preview_raw_badRender() throws Exception {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
     RawEmailTemplates rawEmailTemplates = loadRaw(templatePath.resolve("bad-render-template-text.ftl"), templatePath.resolve("bad-render-template-html.ftl"));
-    PreviewResult result = service.preview(rawEmailTemplates)
+    PreviewResult result = service.preview(null, rawEmailTemplates)
                                   .cc(new EmailAddress("from@example.com"))
                                   .bcc(new EmailAddress("from@example.com"))
                                   .withSubject("test subject")
@@ -162,9 +162,9 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void render() throws Exception {
+  public void render() {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
-    PreviewResult result = service.preview("test-template", singletonList(Locale.US))
+    PreviewResult result = service.preview(null, "test-template", singletonList(Locale.US))
                                   .cc(new EmailAddress("from@example.com"))
                                   .bcc(new EmailAddress("from@example.com"))
                                   .withSubject("test subject")
@@ -182,9 +182,9 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void sendEmailClassPath() throws Exception {
+  public void sendEmailClassPath() {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
-    SendResult result = service.send("test-template", singletonList(Locale.US))
+    SendResult result = service.send(null, "test-template", singletonList(Locale.US))
                                .cc(new EmailAddress("from@example.com"))
                                .bcc(new EmailAddress("from@example.com"))
                                .withSubject("test subject")
@@ -195,6 +195,7 @@ public class DefaultEmailServiceTest {
     assertTrue(result.wasSuccessful());
 
     Email email = EmailTestHelper.getEmailResults().poll();
+    assertNotNull(email);
     assertEquals(email.subject, "test subject");
     assertEquals(email.from.address, "from@example.com");
     assertEquals(email.to.get(0).address, "to@example.com");
@@ -203,14 +204,14 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void sendTemplatedEmail() throws Exception {
+  public void sendTemplatedEmail() {
     Bean bean = new Bean();
     bean.name = "frank";
     bean.bean2 = new Bean2();
     bean.bean2.hobby = "fishing";
 
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
-    SendResult result = service.send("test-template-with-bean", singletonList(Locale.US))
+    SendResult result = service.send(null, "test-template-with-bean", singletonList(Locale.US))
                                .cc(new EmailAddress("from@example.com"))
                                .bcc(new EmailAddress("from@example.com"))
                                .withSubject("test subject")
@@ -221,6 +222,7 @@ public class DefaultEmailServiceTest {
     assertTrue(result.wasSuccessful());
 
     Email email = EmailTestHelper.getEmailResults().poll();
+    assertNotNull(email);
     assertEquals(email.subject, "test subject");
     assertEquals(email.from.address, "from@example.com");
     assertEquals(email.to.get(0).address, "to@example.com");
@@ -229,9 +231,9 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void send_later_badParse() throws Exception {
+  public void send_later_badParse() {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
-    SendResult result = service.send("bad-parse-template", singletonList(Locale.US))
+    SendResult result = service.send(null, "bad-parse-template", singletonList(Locale.US))
                                .cc(new EmailAddress("from@example.com"))
                                .bcc(new EmailAddress("from@example.com"))
                                .withSubject("test subject")
@@ -244,9 +246,9 @@ public class DefaultEmailServiceTest {
   }
 
   @Test
-  public void send_now_badParse() throws Exception {
+  public void send_now_badParse() {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
-    SendResult result = service.send("bad-parse-template", singletonList(Locale.US))
+    SendResult result = service.send(null, "bad-parse-template", singletonList(Locale.US))
                                .cc(new EmailAddress("from@example.com"))
                                .bcc(new EmailAddress("from@example.com"))
                                .withSubject("test subject")
@@ -262,7 +264,7 @@ public class DefaultEmailServiceTest {
   public void validate_badParse() throws Exception {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
     RawEmailTemplates rawEmailTemplates = loadRaw(templatePath.resolve("bad-parse-template-text.ftl"), templatePath.resolve("bad-parse-template-html.ftl"));
-    ValidateResult result = service.validate(rawEmailTemplates, emptyMap());
+    ValidateResult result = service.validate(null, rawEmailTemplates, emptyMap());
     assertFalse(result.wasSuccessful());
     assertNotNull(result.parseErrors.get("text"));
     assertNotNull(result.parseErrors.get("html"));
@@ -274,7 +276,7 @@ public class DefaultEmailServiceTest {
   public void validate_badRender() throws Exception {
     DefaultEmailService service = new DefaultEmailService(new FreeMarkerEmailRenderer(), new FileSystemEmailTemplateLoader(new TestEmailConfiguration(), config), EmailTestHelper.getService());
     RawEmailTemplates rawEmailTemplates = loadRaw(templatePath.resolve("bad-render-template-text.ftl"), templatePath.resolve("bad-render-template-html.ftl"));
-    ValidateResult result = service.validate(rawEmailTemplates, emptyMap());
+    ValidateResult result = service.validate(null, rawEmailTemplates, emptyMap());
     assertFalse(result.wasSuccessful());
     assertNotNull(result.renderErrors.get("text"));
     assertNotNull(result.renderErrors.get("html"));

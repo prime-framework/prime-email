@@ -28,14 +28,14 @@ import static org.testng.Assert.assertEquals;
 public class SendEmailBuilderTest {
   @Test
   public void subjectExplicit() {
-    SendEmailBuilder eb = new SendEmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
+    SendEmailBuilder eb = new SendEmailBuilder(null, null, new Email(), (eb1) -> null, (eb1) -> null);
     eb.withSubject("test subject");
     assertEquals(eb.getSubject(), "test subject");
   }
 
   @Test
   public void templateParams() {
-    SendEmailBuilder eb = new SendEmailBuilder(null, new Email(), (eb1) -> null, (eb1) -> null);
+    SendEmailBuilder eb = new SendEmailBuilder(null, null, new Email(), (eb1) -> null, (eb1) -> null);
     eb = eb.withTemplateParameter("key1", "value1").withTemplateParameter("key2", "value2");
 
     assertEquals(eb.getTemplateParams().size(), 2);

@@ -48,7 +48,7 @@ public class FileSystemEmailTemplateLoader extends BaseEmailTemplateLoader {
   }
 
   @Override
-  public ParsedEmailTemplates load(Object templateId, List<Locale> preferredLanguages, BaseResult baseResult) {
+  public ParsedEmailTemplates load(Object contextId, Object templateId, List<Locale> preferredLanguages, BaseResult baseResult) {
     ParsedEmailTemplates parsedEmailTemplates = new ParsedEmailTemplates();
     parsedEmailTemplates.from = new ParsedEmailAddress();
 

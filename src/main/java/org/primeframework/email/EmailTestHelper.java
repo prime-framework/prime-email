@@ -79,13 +79,13 @@ public class EmailTestHelper {
     future = new MockFuture(false);
 
     service = new EmailTransportService() {
-      public void sendEmail(Email email, SendResult sendResult) {
+      public void sendEmail(Object contextId, Email email, SendResult sendResult) {
         if (sendResult.wasSuccessful()) {
           emailResult.offer(email);
         }
       }
 
-      public void sendEmailLater(Email email, SendResult sendResult) {
+      public void sendEmailLater(Object contextId, Email email, SendResult sendResult) {
         if (sendResult.wasSuccessful()) {
           emailResult.offer(email);
           sendResult.future = future;

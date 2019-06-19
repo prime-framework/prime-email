@@ -15,10 +15,10 @@
  */
 package org.primeframework.email.service;
 
+import java.util.function.Function;
+
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.PreviewResult;
-
-import java.util.function.Function;
 
 /**
  * Builds the email information using a builder pattern. Anything specified via the builder overrides data in the
@@ -28,12 +28,14 @@ public class PreviewEmailBuilder extends BaseEmailBuilder<PreviewEmailBuilder, P
   /**
    * Constructs a new instance.
    *
+   * @param contextId       The context id that helps determine how the email is processed.
    * @param templateId      The id of the template.
    * @param email           The email from the configuration.
    * @param previewFunction The function to call when emails are previewed.
    */
-  PreviewEmailBuilder(Object templateId, Email email, Function<PreviewEmailBuilder, PreviewResult> previewFunction) {
-    super(templateId, email, previewFunction);
+  PreviewEmailBuilder(Object contextId, Object templateId, Email email,
+                      Function<PreviewEmailBuilder, PreviewResult> previewFunction) {
+    super(contextId, templateId, email, previewFunction);
   }
 
   public PreviewResult go() {
