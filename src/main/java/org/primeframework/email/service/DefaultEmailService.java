@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2019, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ public class DefaultEmailService implements EmailService {
     SendResult sendResult = new SendResult(sendEmailBuilder.getEmail());
     ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.load(contextId, templateId, preferredLanguages, sendResult);
     emailRenderer.render(parsedEmailTemplates, sendEmailBuilder.getEmail(), sendEmailBuilder.getParameters(), sendResult);
-    emailTransportService.sendEmailLater(null, sendEmailBuilder.getEmail(), sendResult);
+    emailTransportService.sendEmailLater(contextId, sendEmailBuilder.getEmail(), sendResult);
     return sendResult;
   }
 }
