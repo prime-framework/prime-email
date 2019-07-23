@@ -101,7 +101,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   }
 
   private Message message(Email email, SendResult sendResult, Session session) {
-    Message message = new MimeMessage(session);
+    MimeMessage message = new MimeMessage(session);
 
     try {
       // Define message
@@ -139,7 +139,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
       String subject = email.subject;
       if (subject != null) {
-        message.setSubject(subject);
+        message.setSubject(subject, "UTF-8");
       }
 
       // Determine the email content type and if we need to include the text version

@@ -64,6 +64,19 @@ public class JavaMailEmailTransportServiceTest {
     sendAndVerify(service, email);
   }
 
+  @Test(enabled =  false)
+  public void send_multiByteSubject() throws Exception {
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
+    Email email = new Email();
+    email.from = new EmailAddress("dev@inversoft.com");
+    email.to.add(new EmailAddress("daniel@inversoft.com"));
+    email.subject = "Multi Byte ąęćń";
+    email.text = "text";
+    email.html = "<html><body><h3>html</h3></body></html>";
+
+    sendAndVerify(service, email);
+  }
+
   @Test
   public void sendEmailWithAttachments() throws Exception {
     JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
