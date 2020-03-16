@@ -28,6 +28,7 @@ import org.primeframework.email.service.EmailTransportService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import org.primeframework.email.service.MessagingExceptionHandler;
 
 /**
  * This class provides tests with the ability to setup email handling.
@@ -85,7 +86,24 @@ public class EmailTestHelper {
         }
       }
 
+      @Override
+      public void sendEmail(Object contextId, Email email, SendResult sendResult,
+                            MessagingExceptionHandler messagingExceptionHandler) {
+        if (sendResult.wasSuccessful()) {
+          emailResult.offer(email);
+        }
+      }
+
       public void sendEmailLater(Object contextId, Email email, SendResult sendResult) {
+        if (sendResult.wasSuccessful()) {
+          emailResult.offer(email);
+          sendResult.future = future;
+        }
+      }
+
+      @Override
+      public void sendEmailLater(Object contextId, Email email, SendResult sendResult,
+                                 MessagingExceptionHandler messagingExceptionHandler) {
         if (sendResult.wasSuccessful()) {
           emailResult.offer(email);
           sendResult.future = future;

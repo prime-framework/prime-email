@@ -34,6 +34,18 @@ public interface EmailTransportService {
   void sendEmail(Object contextId, Email email, SendResult sendResult);
 
   /**
+   * Sends an email using some SMTP transport mechanism. This sends the email immediately.
+   *
+   * @param contextId                 The context id that helps determine how the email is processed.
+   * @param email                     The email to send.
+   * @param sendResult                The send result where errors and emails are stored.
+   * @param messagingExceptionHandler The messaging exception handler, use this when you want to provide your own
+   *                                  exception handling.
+   */
+  void sendEmail(Object contextId, Email email, SendResult sendResult,
+                 MessagingExceptionHandler messagingExceptionHandler);
+
+  /**
    * Sends an email using some SMTP transport mechanism. This will always send the message asynchronously and return
    * control immediately to the caller.
    *
@@ -42,4 +54,17 @@ public interface EmailTransportService {
    * @param sendResult The send result where errors and emails are stored.
    */
   void sendEmailLater(Object contextId, Email email, SendResult sendResult);
+
+  /**
+   * Sends an email using some SMTP transport mechanism. This will always send the message asynchronously and return
+   * control immediately to the caller.
+   *
+   * @param contextId                 The context id that helps determine how the email is processed.
+   * @param email                     The email to send.
+   * @param sendResult                The send result where errors and emails are stored.
+   * @param messagingExceptionHandler The messaging exception handler, use this when you want to provide your own
+   *                                  exception handling.
+   */
+  void sendEmailLater(Object contextId, Email email, SendResult sendResult,
+                      MessagingExceptionHandler messagingExceptionHandler);
 }

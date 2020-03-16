@@ -79,6 +79,12 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    */
   @Override
   public void sendEmail(Object contextId, Email email, SendResult sendResult) {
+    sendEmail(contextId, email, sendResult, messagingExceptionHandler);
+  }
+
+  @Override
+  public void sendEmail(Object contextId, Email email, SendResult sendResult,
+                        MessagingExceptionHandler messagingExceptionHandler) {
     Session session = sessionProvider.get(contextId);
     EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
@@ -88,6 +94,12 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
   @Override
   public void sendEmailLater(Object contextId, Email email, SendResult sendResult) {
+    sendEmailLater(contextId, email, sendResult, messagingExceptionHandler);
+  }
+
+  @Override
+  public void sendEmailLater(Object contextId, Email email, SendResult sendResult,
+                             MessagingExceptionHandler messagingExceptionHandler) {
     Session session = sessionProvider.get(contextId);
     EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
