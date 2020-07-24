@@ -15,7 +15,7 @@
  */
 savantVersion = "1.0.0"
 
-project(group: "org.primeframework", name: "prime-email", version: "0.15.1", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-email", version: "0.15.2", licenses: ["ApacheV2_0"]) {
   workflow {
     standard()
   }
@@ -29,7 +29,7 @@ project(group: "org.primeframework", name: "prime-email", version: "0.15.1", lic
       dependency(id: "javax.mail:mail:1.4.4")
     }
     group(name: "compile") {
-      dependency(id: "com.google.inject:guice:4.2.2")
+      dependency(id: "com.google.inject:guice:4.2.3")
       dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.freemarker:freemarker:2.3.28")
       dependency(id: "org.slf4j:slf4j-api:1.7.7")

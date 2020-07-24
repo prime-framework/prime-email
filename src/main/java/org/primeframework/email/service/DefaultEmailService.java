@@ -35,11 +35,11 @@ import org.primeframework.email.domain.ValidateResult;
  * @author Brian Pontarelli
  */
 public class DefaultEmailService implements EmailService {
-  private final EmailRenderer emailRenderer;
+  protected final EmailRenderer emailRenderer;
 
-  private final EmailTemplateLoader emailTemplateLoader;
+  protected final EmailTemplateLoader emailTemplateLoader;
 
-  private final EmailTransportService emailTransportService;
+  protected final EmailTransportService emailTransportService;
 
   /**
    * Constructs a DefaultEmailService. The transport given is used to send the emails.
@@ -86,23 +86,23 @@ public class DefaultEmailService implements EmailService {
     return validateResult;
   }
 
-  private PreviewResult preview(RawEmailTemplates rawEmailTemplates, PreviewEmailBuilder previewEmailBuilder) {
+  protected PreviewResult preview(RawEmailTemplates rawEmailTemplates, PreviewEmailBuilder previewEmailBuilder) {
     PreviewResult previewResult = new PreviewResult(previewEmailBuilder.getEmail());
     ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.parse(rawEmailTemplates, previewResult);
     emailRenderer.render(parsedEmailTemplates, previewEmailBuilder.getEmail(), previewEmailBuilder.getParameters(), previewResult);
     return previewResult;
   }
 
-  private PreviewResult preview(Object contextId, Object templateId, List<Locale> preferredLanguages,
-                                PreviewEmailBuilder previewEmailBuilder) {
+  protected PreviewResult preview(Object contextId, Object templateId, List<Locale> preferredLanguages,
+                                  PreviewEmailBuilder previewEmailBuilder) {
     PreviewResult previewResult = new PreviewResult(previewEmailBuilder.getEmail());
     ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.load(contextId, templateId, preferredLanguages, previewResult);
     emailRenderer.render(parsedEmailTemplates, previewEmailBuilder.getEmail(), previewEmailBuilder.getParameters(), previewResult);
     return previewResult;
   }
 
-  private SendResult send(Object contextId, Object templateId, List<Locale> preferredLanguages,
-                          SendEmailBuilder sendEmailBuilder) {
+  protected SendResult send(Object contextId, Object templateId, List<Locale> preferredLanguages,
+                            SendEmailBuilder sendEmailBuilder) {
     SendResult sendResult = new SendResult(sendEmailBuilder.getEmail());
     ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.load(contextId, templateId, preferredLanguages, sendResult);
     emailRenderer.render(parsedEmailTemplates, sendEmailBuilder.getEmail(), sendEmailBuilder.getParameters(), sendResult);
@@ -110,8 +110,8 @@ public class DefaultEmailService implements EmailService {
     return sendResult;
   }
 
-  private SendResult sendLater(Object contextId, Object templateId, List<Locale> preferredLanguages,
-                               SendEmailBuilder sendEmailBuilder) {
+  protected SendResult sendLater(Object contextId, Object templateId, List<Locale> preferredLanguages,
+                                 SendEmailBuilder sendEmailBuilder) {
     SendResult sendResult = new SendResult(sendEmailBuilder.getEmail());
     ParsedEmailTemplates parsedEmailTemplates = emailTemplateLoader.load(contextId, templateId, preferredLanguages, sendResult);
     emailRenderer.render(parsedEmailTemplates, sendEmailBuilder.getEmail(), sendEmailBuilder.getParameters(), sendResult);
