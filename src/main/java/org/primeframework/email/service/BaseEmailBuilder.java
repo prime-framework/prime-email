@@ -176,6 +176,13 @@ public abstract class BaseEmailBuilder<T extends BaseEmailBuilder<T, U>, U exten
     return (T) this;
   }
 
+  public T withOptionalTemplateParameter(String name, Object value) {
+    if (value != null) {
+      params.put(name, value);
+    }
+    return (T) this;
+  }
+
   public T withSubject(String subject) {
     email.subject = subject;
     return (T) this;
