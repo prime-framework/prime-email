@@ -31,6 +31,12 @@ public abstract class BaseResult {
 
   public final Map<String, TemplateException> renderErrors = new HashMap<>();
 
+  // Optional object that is a reference to the actual template loaded by the Template Loader
+  public Object template;
+
+  // Optional object that is the unique Id of the template
+  public Object templateId;
+
   public BaseResult() {
   }
 
