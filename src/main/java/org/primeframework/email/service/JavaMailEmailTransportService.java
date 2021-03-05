@@ -39,6 +39,7 @@ import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
 import org.primeframework.email.domain.SendResult;
+import org.primeframework.email.service.MessagingExceptionHandler.PrimeMessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,11 +50,11 @@ import org.slf4j.LoggerFactory;
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
+  private final ExecutorService executorService;
+
   private final MessagingExceptionHandler messagingExceptionHandler;
 
-  private ExecutorService executorService;
-
-  private JavaMailSessionProvider sessionProvider;
+  private final JavaMailSessionProvider sessionProvider;
 
   /**
    * Constructs the transport service.
@@ -86,7 +87,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   public void sendEmail(Object contextId, Email email, SendResult sendResult,
                         MessagingExceptionHandler messagingExceptionHandler) {
     Session session = sessionProvider.get(contextId);
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
+    EmailRunnable runnable = new EmailRunnable(contextId, message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       runnable.run();
     }
@@ -101,7 +102,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   public void sendEmailLater(Object contextId, Email email, SendResult sendResult,
                              MessagingExceptionHandler messagingExceptionHandler) {
     Session session = sessionProvider.get(contextId);
-    EmailRunnable runnable = new EmailRunnable(message(email, sendResult, session), sendResult, messagingExceptionHandler);
+    EmailRunnable runnable = new EmailRunnable(contextId, message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
         sendResult.future = executorService.submit(runnable, sendResult);
@@ -213,7 +214,11 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
     private final SendResult sendResult;
 
-    public EmailRunnable(Message message, SendResult sendResult, MessagingExceptionHandler messagingExceptionHandler) {
+    private final Object contextId;
+
+    public EmailRunnable(Object contextId, Message message, SendResult sendResult,
+                         MessagingExceptionHandler messagingExceptionHandler) {
+      this.contextId = contextId;
       this.message = message;
       this.messagingExceptionHandler = messagingExceptionHandler;
       this.sendResult = sendResult;
@@ -225,7 +230,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
         Transport.send(message);
         logger.debug("Finished JavaMail send");
       } catch (MessagingException e) {
-        messagingExceptionHandler.handle(e);
+        messagingExceptionHandler.handle(new PrimeMessagingException(e, contextId, sendResult));
         sendResult.transportError = "Unable to send email via JavaMail";
       }
     }

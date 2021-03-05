@@ -17,6 +17,8 @@ package org.primeframework.email.service;
 
 import javax.mail.MessagingException;
 
+import org.primeframework.email.domain.SendResult;
+
 /**
  * @author Daniel DeGroff
  */
@@ -26,5 +28,18 @@ public interface MessagingExceptionHandler {
    *
    * @param e the exception to handle
    */
-  void handle(MessagingException e);
+  void handle(PrimeMessagingException e);
+
+  class PrimeMessagingException extends MessagingException {
+
+    public Object contextId;
+
+    public SendResult sendResult;
+
+    public PrimeMessagingException(Exception e, Object contextId, SendResult sendResult) {
+      super("Prime Messaging Exception", e);
+      this.contextId = contextId;
+      this.sendResult = sendResult;
+    }
+  }
 }

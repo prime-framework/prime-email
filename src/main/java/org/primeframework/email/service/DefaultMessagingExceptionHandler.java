@@ -18,15 +18,13 @@ package org.primeframework.email.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.MessagingException;
-
 /**
  * @author Daniel DeGroff
  */
 public class DefaultMessagingExceptionHandler implements MessagingExceptionHandler {
   private final static Logger logger = LoggerFactory.getLogger(DefaultMessagingExceptionHandler.class);
 
-  public void handle(MessagingException e) {
+  public void handle(PrimeMessagingException e) {
     logger.error("Unable to send email via JavaMail", e);
   }
 }
