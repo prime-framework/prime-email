@@ -22,12 +22,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.SendResult;
 import org.primeframework.email.service.EmailTransportService;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 import org.primeframework.email.service.MessagingExceptionHandler;
 
 /**
@@ -42,15 +41,26 @@ public class EmailTestHelper {
 
   private static Future<SendResult> future = new MockFuture(false);
 
+  private static Queue<SendResult> results = new LinkedList<>();
+
   private static EmailTransportService service;
 
   /**
    * Returns the email results for the last test run. This is a thread safe retrieval.
    *
-   * @return The email results or null if there isn't any.
+   * @return The email results
    */
   public static Queue<Email> getEmailResults() {
     return emailResult;
+  }
+
+  /**
+   * Returns the results.
+   *
+   * @return The send results
+   */
+  public static Queue<SendResult> getResults() {
+    return results;
   }
 
   /**
@@ -81,6 +91,7 @@ public class EmailTestHelper {
 
     service = new EmailTransportService() {
       public void sendEmail(Object contextId, Email email, SendResult sendResult) {
+        results.offer(sendResult);
         if (sendResult.wasSuccessful()) {
           emailResult.offer(email);
         }
@@ -89,12 +100,14 @@ public class EmailTestHelper {
       @Override
       public void sendEmail(Object contextId, Email email, SendResult sendResult,
                             MessagingExceptionHandler messagingExceptionHandler) {
+        results.offer(sendResult);
         if (sendResult.wasSuccessful()) {
           emailResult.offer(email);
         }
       }
 
       public void sendEmailLater(Object contextId, Email email, SendResult sendResult) {
+        results.offer(sendResult);
         if (sendResult.wasSuccessful()) {
           emailResult.offer(email);
           sendResult.future = future;
@@ -104,6 +117,7 @@ public class EmailTestHelper {
       @Override
       public void sendEmailLater(Object contextId, Email email, SendResult sendResult,
                                  MessagingExceptionHandler messagingExceptionHandler) {
+        results.offer(sendResult);
         if (sendResult.wasSuccessful()) {
           emailResult.offer(email);
           sendResult.future = future;
