@@ -15,6 +15,8 @@
  */
 package org.primeframework.email.service;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import java.util.Properties;
 
@@ -39,16 +41,40 @@ public class JavaMailEmailTransportServiceTest {
 
   @BeforeClass
   public static void setup() {
-    // Set the auth
     Properties props = new Properties();
+    props.setProperty("mail.transport.protocol", "smtp");
     props.setProperty("mail.smtp.host", "localhost");
     props.setProperty("mail.host", "localhost");
-
-    // Set the protocol for the JavaMail client
-    props.setProperty("mail.transport.protocol", "smtp");
     props.setProperty("mail.smtp.localhost", "localhost");
 
-    session = Session.getInstance(props, null);
+    Authenticator auth = null;
+
+    // To test against a real SMTP server such as sendgrid, set a username & password, don't check those in please.
+    String username = "";
+    String password = "";
+
+    //noinspection ConstantConditions
+    if (!password.equals("")) {
+      // Set the auth
+      props.setProperty("mail.smtp.host", "smtp.sendgrid.net");
+      props.setProperty("mail.host", "smtp.sendgrid.net");
+      props.setProperty("mail.smtp.port", "" + 587);
+      props.setProperty("mail.smtp.starttls.enable", "true");
+      props.setProperty("mail.smtp.auth", "true");
+      props.setProperty("mail.user", username);
+      props.setProperty("mail.password", password);
+      props.setProperty("mail.smtp.username", username);
+      props.setProperty("mail.smtp.password", password);
+      props.put("mail.smtp.ssl.protocols", "TLSv1 TLSv1.1 TLSv1.2");
+      auth = new Authenticator() {
+        @Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+          return new PasswordAuthentication(username, password);
+        }
+      };
+    }
+
+    session = Session.getInstance(props, auth);
   }
 
   @Test
@@ -58,19 +84,6 @@ public class JavaMailEmailTransportServiceTest {
     email.from = new EmailAddress("dev@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
     email.subject = "Test email";
-    email.text = "text";
-    email.html = "<html><body><h3>html</h3></body></html>";
-
-    sendAndVerify(service, email);
-  }
-
-  @Test(enabled =  false)
-  public void send_multiByteSubject() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
-    Email email = new Email();
-    email.from = new EmailAddress("dev@inversoft.com");
-    email.to.add(new EmailAddress("daniel@inversoft.com"));
-    email.subject = "Multi Byte ąęćń";
     email.text = "text";
     email.html = "<html><body><h3>html</h3></body></html>";
 
@@ -87,6 +100,19 @@ public class JavaMailEmailTransportServiceTest {
     email.text = "text";
     email.html = "<html><body><h3>html</h3></body></html>";
     email.attachments.add(new Attachment("test.txt", "text/plain", "Hello world".getBytes()));
+
+    sendAndVerify(service, email);
+  }
+
+  @Test(enabled = false)
+  public void send_multiByteSubjectAndBody() throws Exception {
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
+    Email email = new Email();
+    email.from = new EmailAddress("dev@fusionauth.com");
+    email.to.add(new EmailAddress("daniel@fusionauth.io"));
+    email.subject = "Multi Byte ąęćń";
+    email.text = "text ąęćń";
+    email.html = "<html><body><h3>html</h3>ąęćń</body></html>";
 
     sendAndVerify(service, email);
   }

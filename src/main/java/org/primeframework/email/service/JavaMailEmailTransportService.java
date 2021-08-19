@@ -31,8 +31,10 @@ import javax.mail.util.ByteArrayDataSource;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.google.inject.Inject;
 import org.primeframework.email.domain.Attachment;
@@ -66,13 +68,14 @@ public class JavaMailEmailTransportService implements EmailTransportService {
                                        JavaMailSessionProvider sessionProvider) {
     this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
-    this.executorService = Executors.newCachedThreadPool(
+    // Create a bound thread executor pool of 1 to 5 threads with a keep alive for idle threads of 60 seconds.
+    this.executorService = new ThreadPoolExecutor(1, 5, 60L, TimeUnit.SECONDS,
+        new LinkedBlockingQueue<>(),
         (r) -> {
           Thread t = new Thread(r, "Prime-Email Executor Thread");
           t.setDaemon(true);
           return t;
-        }
-    );
+        });
   }
 
   /**
@@ -167,8 +170,8 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       Multipart mp = new MimeMultipart(type);
       String text = email.text;
       if (includeText && text != null) {
-        BodyPart textPart = new MimeBodyPart();
-        textPart.setText(text);
+        MimeBodyPart textPart = new MimeBodyPart();
+        textPart.setText(text, "UTF-8");
         mp.addBodyPart(textPart);
       }
 
@@ -208,13 +211,13 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   public static class EmailRunnable implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(EmailRunnable.class);
 
+    private final Object contextId;
+
     private final Message message;
 
     private final MessagingExceptionHandler messagingExceptionHandler;
 
     private final SendResult sendResult;
-
-    private final Object contextId;
 
     public EmailRunnable(Object contextId, Message message, SendResult sendResult,
                          MessagingExceptionHandler messagingExceptionHandler) {
