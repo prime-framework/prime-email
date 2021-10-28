@@ -15,7 +15,7 @@
  */
 package org.primeframework.email.service;
 
-import javax.mail.Session;
+import jakarta.mail.Session;
 
 /**
  * @author Brian Pontarelli

@@ -15,12 +15,12 @@
  */
 package org.primeframework.email.guice;
 
-import javax.mail.Session;
 import javax.naming.InitialContext;
 import javax.naming.NameParser;
 import javax.naming.NamingException;
 
 import com.google.inject.Provider;
+import jakarta.mail.Session;
 
 /**
  * Provides JavaMail sessions via JNDI.
