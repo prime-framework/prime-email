@@ -16,7 +16,7 @@
 
 guavaVersion = "30.1.0-jre"
 guiceVersion = "5.0.1"
-jakartaMailVersion = "2.0.1"
+jakartaVersion = "2.0.1"
 savantVersion = "1.0.0"
 slf4jVersion = "2.0.0-alpha5"
 
@@ -31,13 +31,13 @@ project(group: "org.primeframework", name: "prime-email", version: "0.16.0", lic
 
   dependencies {
     group(name: "provided") {
-      dependency(id: "com.sun.mail:jakarta.mail:${jakartaMailVersion}")
-      dependency(id: "com.sun.activation:jakarta.activation:${jakartaMailVersion}")
+      dependency(id: "com.sun.mail:jakarta.mail:${jakartaVersion}")
+      dependency(id: "com.sun.activation:jakarta.activation:${jakartaVersion}")
     }
     group(name: "compile") {
       dependency(id: "com.google.inject:guice:${guiceVersion}")
       dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
-      dependency(id: "jakarta.mail:jakarta.mail-api:${jakartaMailVersion}")
+      dependency(id: "jakarta.mail:jakarta.mail-api:${jakartaVersion}")
       dependency(id: "javax.inject:javax.inject:1.0.0")
       dependency(id: "org.freemarker:freemarker:2.3.28")
       dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}")
