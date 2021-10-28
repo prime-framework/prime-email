@@ -61,8 +61,8 @@ idea = loadPlugin(id: "org.savantbuild.plugin:idea:${savantVersion}")
 release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
 
 // Plugin settings
-java.settings.javaVersion = "17"
-javaTestNG.settings.javaVersion = "17"
+java.settings.javaVersion = "1.8"
+javaTestNG.settings.javaVersion = "1.8"
 
 target(name: "clean", description: "Cleans the project") {
   java.clean()
