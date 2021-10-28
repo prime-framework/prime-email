@@ -28,11 +28,11 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/jakarta/mail/jakarta.mail-api/2.0.1/jakarta.mail-api-2.0.1.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/sun/mail/jakarta.mail/2.0.1/jakarta.mail-2.0.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/jakarta/mail/jakarta.mail-api/2.0.1/jakarta.mail-api-2.0.1-src.jar!/" />
+          <root url="jar://$USER_HOME$/.savant/cache/com/sun/mail/jakarta.mail/2.0.1/jakarta.mail-2.0.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -55,6 +55,17 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.savant/cache/com/google/inject/guice/5.0.1/guice-5.0.1-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/jakarta/mail/jakarta.mail-api/2.0.1/jakarta.mail-api-2.0.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/jakarta/mail/jakarta.mail-api/2.0.1/jakarta.mail-api-2.0.1-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
