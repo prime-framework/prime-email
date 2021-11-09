@@ -15,8 +15,7 @@
  */
 package org.primeframework.email.service;
 
-import javax.mail.MessagingException;
-
+import jakarta.mail.MessagingException;
 import org.primeframework.email.domain.SendResult;
 
 /**
