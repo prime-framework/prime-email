@@ -17,6 +17,7 @@ package org.primeframework.email.service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -156,6 +157,12 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       String subject = email.subject;
       if (subject != null) {
         message.setSubject(subject, "UTF-8");
+      }
+
+      if (email.headers.size() > 0) {
+        for (Map.Entry<String, String> entry : email.headers.entrySet()) {
+          message.addHeader(entry.getKey(), entry.getValue());
+        }
       }
 
       // Determine the email content type and if we need to include the text version

@@ -120,6 +120,10 @@ public abstract class BaseEmailBuilder<T extends BaseEmailBuilder<T, U>, U exten
     return email.from;
   }
 
+  public Map<String, String> getHeaders() {
+    return email.headers;
+  }
+
   public Map<String, Object> getParameters() {
     return params;
   }
@@ -173,6 +177,16 @@ public abstract class BaseEmailBuilder<T extends BaseEmailBuilder<T, U>, U exten
 
   public T withAttachments(Attachment... attachments) {
     email.attachments = asList(attachments);
+    return (T) this;
+  }
+
+  public T withHeader(String key, String value) {
+    email.headers.put(key, value);
+    return (T) this;
+  }
+
+  public T withHeaders(Map<String, String> headers) {
+    email.headers.putAll(headers);
     return (T) this;
   }
 

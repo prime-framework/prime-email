@@ -104,6 +104,21 @@ public class JavaMailEmailTransportServiceTest {
     sendAndVerify(service, email);
   }
 
+  @Test
+  public void sendEmailWithHeaders() throws Exception {
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
+    Email email = new Email();
+    email.from = new EmailAddress("brett@fusionauth.io");
+    email.to.add(new EmailAddress("brett@fusionauth.io"));
+    email.subject = "Test email";
+    email.text = "text";
+    email.html = "<html><body><h3>html</h3></body></html>";
+    email.headers.put("X-SES-CONFIGURATION-SET", "ConfigSet");
+    email.headers.put("Return-Path", "<admin@fusionauth.io>");
+
+    sendAndVerify(service, email);
+  }
+
   @Test(enabled = false)
   public void send_multiByteSubjectAndBody() throws Exception {
     JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));

@@ -16,7 +16,9 @@
 package org.primeframework.email.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,6 +34,8 @@ public class Email {
   public List<EmailAddress> cc = new ArrayList<>();
 
   public EmailAddress from;
+
+  public Map<String, String> headers = new HashMap<>();
 
   public String html;
 
@@ -56,6 +60,7 @@ public class Email {
         Objects.equals(bcc, email.bcc) &&
         Objects.equals(cc, email.cc) &&
         Objects.equals(from, email.from) &&
+        Objects.equals(headers, email.headers) &&
         Objects.equals(html, email.html) &&
         Objects.equals(replyTo, email.replyTo) &&
         Objects.equals(subject, email.subject) &&
@@ -65,6 +70,6 @@ public class Email {
 
   @Override
   public int hashCode() {
-    return Objects.hash(attachments, bcc, cc, from, html, replyTo, subject, text, to);
+    return Objects.hash(attachments, bcc, cc, from, headers, html, replyTo, subject, text, to);
   }
 }
