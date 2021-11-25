@@ -23,6 +23,7 @@ import jakarta.mail.Session;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.EmailHeader;
 import org.primeframework.email.domain.SendResult;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -106,6 +107,8 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmailWithHeaders() throws Exception {
+    // Note this test is not able to assert that the outgoing SMTP message actually included these headers.
+    // To test, send yourself an email and review the headers.
     JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
     Email email = new Email();
     email.from = new EmailAddress("brett@fusionauth.io");
@@ -113,8 +116,8 @@ public class JavaMailEmailTransportServiceTest {
     email.subject = "Test email";
     email.text = "text";
     email.html = "<html><body><h3>html</h3></body></html>";
-    email.headers.put("X-SES-CONFIGURATION-SET", "ConfigSet");
-    email.headers.put("Return-Path", "<admin@fusionauth.io>");
+    email.additionalHeaders.add(new EmailHeader("X-SES-CONFIGURATION-SET", "ConfigSet"));
+    email.additionalHeaders.add(new EmailHeader("Return-Path", "<admin@fusionauth.io>"));
 
     sendAndVerify(service, email);
   }

@@ -20,13 +20,19 @@ jakartaVersion = "2.0.1"
 savantVersion = "1.0.0"
 slf4jVersion = "2.0.0-alpha5"
 
-project(group: "org.primeframework", name: "prime-email", version: "0.16.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-email", version: "0.17.0", licenses: ["ApacheV2_0"]) {
   workflow {
-    standard()
+    fetch {
+      cache()
+      url(url: "https://external.savant.fusionauth.io")
+    }
+    publish {
+      cache()
+    }
   }
 
   publishWorkflow {
-    subversion(repository: "http://svn.inversoft.org/savant")
+    subversion(repository: "https://external.svn.fusionauth.io")
   }
 
   dependencies {
