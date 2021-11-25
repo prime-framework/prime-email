@@ -24,6 +24,7 @@ import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.BaseResult;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.EmailHeader;
 import static java.util.Arrays.asList;
 
 /**
@@ -41,7 +42,6 @@ public abstract class BaseEmailBuilder<T extends BaseEmailBuilder<T, U>, U exten
   protected final Map<String, Object> params = new HashMap<>();
 
   protected final Object templateId;
-
 
   /**
    * Constructs a new instance.
@@ -120,6 +120,10 @@ public abstract class BaseEmailBuilder<T extends BaseEmailBuilder<T, U>, U exten
     return email.from;
   }
 
+  public List<EmailHeader> getHeaders() {
+    return email.additionalHeaders;
+  }
+
   public Map<String, Object> getParameters() {
     return params;
   }
@@ -173,6 +177,21 @@ public abstract class BaseEmailBuilder<T extends BaseEmailBuilder<T, U>, U exten
 
   public T withAttachments(Attachment... attachments) {
     email.attachments = asList(attachments);
+    return (T) this;
+  }
+
+  public T withHeader(String name, String value) {
+    email.additionalHeaders.add(new EmailHeader(name, value));
+    return (T) this;
+  }
+
+  public T withHeader(EmailHeader header) {
+    email.additionalHeaders.add(header);
+    return (T) this;
+  }
+
+  public T withHeaders(List<EmailHeader> headers) {
+    email.additionalHeaders.addAll(headers);
     return (T) this;
   }
 

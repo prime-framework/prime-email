@@ -40,6 +40,7 @@ import jakarta.mail.util.ByteArrayDataSource;
 import org.primeframework.email.domain.Attachment;
 import org.primeframework.email.domain.Email;
 import org.primeframework.email.domain.EmailAddress;
+import org.primeframework.email.domain.EmailHeader;
 import org.primeframework.email.domain.SendResult;
 import org.primeframework.email.service.MessagingExceptionHandler.PrimeMessagingException;
 import org.slf4j.Logger;
@@ -156,6 +157,10 @@ public class JavaMailEmailTransportService implements EmailTransportService {
       String subject = email.subject;
       if (subject != null) {
         message.setSubject(subject, "UTF-8");
+      }
+
+      for (EmailHeader header : email.additionalHeaders) {
+        message.addHeader(header.name, header.value);
       }
 
       // Determine the email content type and if we need to include the text version
