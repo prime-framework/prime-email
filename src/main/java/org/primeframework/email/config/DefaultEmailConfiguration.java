@@ -22,10 +22,10 @@ package org.primeframework.email.config;
  */
 public class DefaultEmailConfiguration implements EmailConfiguration {
   /**
-   * @return /WEB-INF/emails
+   * @return `emails` which is relative to the web application root of web in the Prime HTTP server and Prime MVC.
    */
   @Override
   public String templateLocation() {
-    return "/WEB-INF/emails";
+    return "emails";
   }
 }
