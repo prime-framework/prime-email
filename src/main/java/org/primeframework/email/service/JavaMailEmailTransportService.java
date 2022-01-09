@@ -53,11 +53,22 @@ import org.slf4j.LoggerFactory;
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
-  private final ExecutorService executorService;
+  private static final ExecutorService ExecutorService;
 
   private final MessagingExceptionHandler messagingExceptionHandler;
 
   private final JavaMailSessionProvider sessionProvider;
+
+  static {
+    // Create a bound thread executor pool of 1 to 5 threads with a keep alive for idle threads of 60 seconds.
+    ExecutorService = new ThreadPoolExecutor(1, 5, 60L, TimeUnit.SECONDS,
+        new LinkedBlockingQueue<>(),
+        (r) -> {
+          Thread t = new Thread(r, "Prime-Email Executor Thread");
+          t.setDaemon(true);
+          return t;
+        });
+  }
 
   /**
    * Constructs the transport service.
@@ -69,14 +80,6 @@ public class JavaMailEmailTransportService implements EmailTransportService {
                                        JavaMailSessionProvider sessionProvider) {
     this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
-    // Create a bound thread executor pool of 1 to 5 threads with a keep alive for idle threads of 60 seconds.
-    this.executorService = new ThreadPoolExecutor(1, 5, 60L, TimeUnit.SECONDS,
-        new LinkedBlockingQueue<>(),
-        (r) -> {
-          Thread t = new Thread(r, "Prime-Email Executor Thread");
-          t.setDaemon(true);
-          return t;
-        });
   }
 
   /**
@@ -109,7 +112,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     EmailRunnable runnable = new EmailRunnable(contextId, message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
-        sendResult.future = executorService.submit(runnable, sendResult);
+        sendResult.future = ExecutorService.submit(runnable, sendResult);
       } catch (RejectedExecutionException ree) {
         sendResult.transportError = "Unable to submit the JavaMail message to the asynchronous handler " +
             "so that it can be processed at a later time. The email was therefore not sent.";
