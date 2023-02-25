@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2023, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,9 @@ package org.primeframework.email.service;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.google.inject.Inject;
 import jakarta.activation.DataHandler;
@@ -60,10 +59,25 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   private final JavaMailSessionProvider sessionProvider;
 
   static {
+    // Please note:
+    //
+    //  When using a LinkedBlockingQueue with the ExecutorService, the corePoolSize needs to match the maximumPoolSize. In other words
+    //  it has to be a fixed size thread pool. By default, the LinkedBlockingQueue has an unbound capacity (Integer.MAX_VALUE), so it seems
+    //  that the ExecutorService will happily queue and never spin up workers past the corePoolSize. See ThreadPoolExecutor.execute for details.
+    //
+    //  Summary of ThreadPoolExecutor.execute:
+    //    1. If thread count is less than corePoolSize, add a new worker with the current command.
+    //    2. Else, queue command
+    //    3. Else, if queue failed, add a new worker thread.
+    //
+    //  So because we were using a LinkedBlockingQueue essentially unbound, as long as we could queue up events, we would not start any new threads.
+    //
+    //  For this reason, you either have to use a fixed thread pool, or use a SynchronousQueue which is essentially queue w/out capacity - a pipe.
+    //
+
     // Create a bound thread executor pool of 1 to 5 threads with a keep alive for idle threads of 60 seconds.
-    ExecutorService = new ThreadPoolExecutor(1, 5, 60L, TimeUnit.SECONDS,
-        new LinkedBlockingQueue<>(),
-        (r) -> {
+    ExecutorService = Executors.newCachedThreadPool(
+        r -> {
           Thread t = new Thread(r, "Prime-Email Executor Thread");
           t.setDaemon(true);
           return t;
@@ -73,13 +87,23 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   /**
    * Constructs the transport service.
    *
-   * @param sessionProvider The Java mail session provider.
+   * @param messagingExceptionHandler The messaging exception handler
+   * @param sessionProvider           The Java mail session provider.
    */
   @Inject
   public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler,
                                        JavaMailSessionProvider sessionProvider) {
     this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
+  }
+
+  /**
+   * Careful with this one. With great power...
+   *
+   * @return the thread pool executor service in use by the Email Transport service.
+   */
+  public ThreadPoolExecutor getExecutorService() {
+    return (ThreadPoolExecutor) ExecutorService;
   }
 
   /**
