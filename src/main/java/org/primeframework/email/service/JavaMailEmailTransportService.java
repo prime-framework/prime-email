@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
-  private static final ExecutorService ExecutorService;
+  private static final ExecutorService Executor;
 
   private final MessagingExceptionHandler messagingExceptionHandler;
 
@@ -77,7 +77,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
     // Create a fixed thread pool with an unbound blocking queue. This means we will always have 5 threads waiting to work, and
     // we will allow new requests to be queued using an unbound queue.
-    ExecutorService = Executors.newFixedThreadPool(5,
+    Executor = Executors.newFixedThreadPool(5,
         r -> {
           Thread t = new Thread(r, "Prime-Email Executor Thread");
           t.setDaemon(true);
@@ -99,12 +99,12 @@ public class JavaMailEmailTransportService implements EmailTransportService {
   }
 
   /**
-   * Careful with this one. With great power...
+   * This is intended to allow you to collect metrics on this executor. Careful with this one. With great power...
    *
-   * @return the thread pool executor service in use by the Email Transport service.
+   * @return the thread pool executor in use by the Email Transport service.
    */
-  public ThreadPoolExecutor getExecutorService() {
-    return (ThreadPoolExecutor) ExecutorService;
+  public ThreadPoolExecutor getExecutor() {
+    return (ThreadPoolExecutor) Executor;
   }
 
   /**
@@ -137,7 +137,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     EmailRunnable runnable = new EmailRunnable(contextId, message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
-        sendResult.future = ExecutorService.submit(runnable, sendResult);
+        sendResult.future = Executor.submit(runnable, sendResult);
       } catch (RejectedExecutionException ree) {
         sendResult.transportError = "Unable to submit the JavaMail message to the asynchronous handler " +
             "so that it can be processed at a later time. The email was therefore not sent.";
