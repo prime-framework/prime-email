@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.primeframework.email.service.EmailTransportService;
 import org.primeframework.email.service.FreeMarkerEmailRenderer;
 import org.primeframework.email.service.JavaMailEmailTransportService;
 import org.primeframework.email.service.MessagingExceptionHandler;
+import static com.google.inject.Scopes.SINGLETON;
 
 /**
  * Binds all the services and configuration objects for emailing.
@@ -34,6 +35,13 @@ import org.primeframework.email.service.MessagingExceptionHandler;
  * @author Brian Pontarelli
  */
 public abstract class EmailModule extends AbstractModule {
+  /**
+   * Implement this method to bind the {@link org.primeframework.email.service.MessagingExceptionHandler} interface.
+   */
+  protected void bindMessagingExceptionHandler() {
+    bind(MessagingExceptionHandler.class).to(DefaultMessagingExceptionHandler.class);
+  }
+
   /**
    * Implement this method to bind a JavaMail Session Provider (or the session directly if you want).
    */
@@ -44,19 +52,13 @@ public abstract class EmailModule extends AbstractModule {
    */
   protected abstract void bindTemplateLoader();
 
-  /**
-   * Implement this method to bind the {@link org.primeframework.email.service.MessagingExceptionHandler} interface.
-   */
-  protected void bindMessagingExceptionHandler() {
-    bind(MessagingExceptionHandler.class).to(DefaultMessagingExceptionHandler.class);
-  }
-
   @Override
   protected void configure() {
     bind(EmailConfiguration.class).to(DefaultEmailConfiguration.class);
     bind(EmailService.class).to(DefaultEmailService.class);
-    bind(EmailTransportService.class).to(JavaMailEmailTransportService.class);
     bind(EmailRenderer.class).to(FreeMarkerEmailRenderer.class);
+    // Lazy singleton
+    bind(EmailTransportService.class).to(JavaMailEmailTransportService.class).in(SINGLETON);
 
     bindSessionProvider();
     bindTemplateLoader();

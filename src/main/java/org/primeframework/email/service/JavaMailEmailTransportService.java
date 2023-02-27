@@ -15,6 +15,7 @@
  */
 package org.primeframework.email.service;
 
+import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +24,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.BodyPart;
@@ -51,14 +53,26 @@ import org.slf4j.LoggerFactory;
  *
  * @author Brian Pontarelli
  */
-public class JavaMailEmailTransportService implements EmailTransportService {
-  private static final ExecutorService Executor;
+@Singleton
+public class JavaMailEmailTransportService implements EmailTransportService, Closeable {
+  private final ExecutorService executor;
 
   private final MessagingExceptionHandler messagingExceptionHandler;
 
   private final JavaMailSessionProvider sessionProvider;
 
-  static {
+  /**
+   * Constructs the transport service.
+   *
+   * @param messagingExceptionHandler The messaging exception handler
+   * @param sessionProvider           The Java mail session provider.
+   */
+  @Inject
+  public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler,
+                                       JavaMailSessionProvider sessionProvider) {
+    this.messagingExceptionHandler = messagingExceptionHandler;
+    this.sessionProvider = sessionProvider;
+
     // Please note:
     //
     //  When using a LinkedBlockingQueue with the ExecutorService, the corePoolSize needs to match the maximumPoolSize. In other words
@@ -77,7 +91,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
 
     // Create a fixed thread pool with an unbound blocking queue. This means we will always have 5 threads waiting to work, and
     // we will allow new requests to be queued using an unbound queue.
-    Executor = Executors.newFixedThreadPool(5,
+    executor = Executors.newFixedThreadPool(5,
         r -> {
           Thread t = new Thread(r, "Prime-Email Executor Thread");
           t.setDaemon(true);
@@ -85,17 +99,9 @@ public class JavaMailEmailTransportService implements EmailTransportService {
         });
   }
 
-  /**
-   * Constructs the transport service.
-   *
-   * @param messagingExceptionHandler The messaging exception handler
-   * @param sessionProvider           The Java mail session provider.
-   */
-  @Inject
-  public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler,
-                                       JavaMailSessionProvider sessionProvider) {
-    this.messagingExceptionHandler = messagingExceptionHandler;
-    this.sessionProvider = sessionProvider;
+  @Override
+  public void close() {
+    executor.shutdownNow();
   }
 
   /**
@@ -104,7 +110,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
    * @return the thread pool executor in use by the Email Transport service.
    */
   public ThreadPoolExecutor getExecutor() {
-    return (ThreadPoolExecutor) Executor;
+    return (ThreadPoolExecutor) executor;
   }
 
   /**
@@ -137,7 +143,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     EmailRunnable runnable = new EmailRunnable(contextId, message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
-        sendResult.future = Executor.submit(runnable, sendResult);
+        sendResult.future = executor.submit(runnable, sendResult);
       } catch (RejectedExecutionException ree) {
         sendResult.transportError = "Unable to submit the JavaMail message to the asynchronous handler " +
             "so that it can be processed at a later time. The email was therefore not sent.";
