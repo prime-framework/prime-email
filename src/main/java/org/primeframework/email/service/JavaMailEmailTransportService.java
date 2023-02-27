@@ -75,8 +75,9 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     //  For this reason, you either have to use a fixed thread pool, or use a SynchronousQueue which is essentially queue w/out capacity - a pipe.
     //
 
-    // Create a bound thread executor pool of 1 to 5 threads with a keep alive for idle threads of 60 seconds.
-    ExecutorService = Executors.newCachedThreadPool(
+    // Create a fixed thread pool with an unbound blocking queue. This means we will always have 5 threads waiting to work, and
+    // we will allow new requests to be queued using an unbound queue.
+    ExecutorService = Executors.newFixedThreadPool(5,
         r -> {
           Thread t = new Thread(r, "Prime-Email Executor Thread");
           t.setDaemon(true);
