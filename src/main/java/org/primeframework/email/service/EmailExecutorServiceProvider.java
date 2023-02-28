@@ -48,9 +48,13 @@ public class EmailExecutorServiceProvider implements Provider<ExecutorService> {
     // when all 5 threads are busy, new work will be added to an unbound queue.
     return Executors.newFixedThreadPool(5,
         r -> {
-          Thread t = new Thread(r, "Prime-Email Executor Thread");
+          Thread t = new Thread(r, threadName());
           t.setDaemon(true);
           return t;
         });
+  }
+
+  protected String threadName() {
+    return "Prime-Email Executor Thread";
   }
 }
