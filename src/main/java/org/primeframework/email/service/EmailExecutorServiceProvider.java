@@ -15,7 +15,6 @@
  */
 package org.primeframework.email.service;
 
-import java.io.Closeable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,17 +24,9 @@ import com.google.inject.Provider;
 /**
  * @author Daniel DeGroff
  */
-public class EmailExecutorServiceProvider implements Provider<ExecutorService>, Closeable {
-  private ExecutorService executorService;
-
-  @Override
-  public void close() {
-    executorService.shutdownNow();
-  }
-
+public class EmailExecutorServiceProvider implements Provider<ExecutorService> {
   @Override
   public ExecutorService get() {
-
     // Please note:
     //
     //  When using a LinkedBlockingQueue with the ExecutorService, the corePoolSize needs to match the maximumPoolSize. In other words
@@ -54,14 +45,12 @@ public class EmailExecutorServiceProvider implements Provider<ExecutorService>, 
 
     // Create a fixed thread pool with an unbound blocking queue. This means we will always have 5 threads waiting to work, and
     // when all 5 threads are busy, new work will be added to an unbound queue.
-    executorService = Executors.newFixedThreadPool(5,
+    return Executors.newFixedThreadPool(5,
         r -> {
           Thread t = new Thread(r, threadName());
           t.setDaemon(true);
           return t;
         });
-
-    return executorService;
   }
 
   protected String threadName() {
