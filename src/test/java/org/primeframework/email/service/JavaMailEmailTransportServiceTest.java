@@ -16,7 +16,10 @@
 package org.primeframework.email.service;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
@@ -39,6 +42,10 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = "unit")
 public class JavaMailEmailTransportServiceTest {
   private static Session session;
+
+  @Inject
+  @Named("EmailExecutorService")
+  public ExecutorService executorService;
 
   @BeforeClass
   public static void setup() {
@@ -80,7 +87,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmail() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(executorService, new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
     Email email = new Email();
     email.from = new EmailAddress("dev@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
@@ -93,7 +100,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test
   public void sendEmailWithAttachments() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(executorService, new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
     Email email = new Email();
     email.from = new EmailAddress("brian@inversoft.com");
     email.to.add(new EmailAddress("brian@inversoft.com"));
@@ -109,7 +116,7 @@ public class JavaMailEmailTransportServiceTest {
   public void sendEmailWithHeaders() throws Exception {
     // Note this test is not able to assert that the outgoing SMTP message actually included these headers.
     // To test, send yourself an email and review the headers.
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(executorService, new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
     Email email = new Email();
     email.from = new EmailAddress("brett@fusionauth.io");
     email.to.add(new EmailAddress("brett@fusionauth.io"));
@@ -124,7 +131,7 @@ public class JavaMailEmailTransportServiceTest {
 
   @Test(enabled = false)
   public void send_multiByteSubjectAndBody() throws Exception {
-    JavaMailEmailTransportService service = new JavaMailEmailTransportService(new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
+    JavaMailEmailTransportService service = new JavaMailEmailTransportService(executorService, new DefaultMessagingExceptionHandler(), new TestJavaMailSessionProvider(session));
     Email email = new Email();
     email.from = new EmailAddress("dev@fusionauth.com");
     email.to.add(new EmailAddress("daniel@fusionauth.io"));

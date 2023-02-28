@@ -72,6 +72,17 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$USER_HOME$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$USER_HOME$/.savant/cache/com/google/guava/guava/30.1.0-jre/guava-30.1.0-jre.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -120,17 +131,6 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0-src.jar!/" />
-        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">

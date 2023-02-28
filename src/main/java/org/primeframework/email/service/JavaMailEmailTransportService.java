@@ -19,12 +19,10 @@ import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.BodyPart;
@@ -53,9 +51,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Brian Pontarelli
  */
-@Singleton
 public class JavaMailEmailTransportService implements EmailTransportService, Closeable {
-  private final ExecutorService executor;
+  private final ExecutorService executorService;
 
   private final MessagingExceptionHandler messagingExceptionHandler;
 
@@ -64,53 +61,23 @@ public class JavaMailEmailTransportService implements EmailTransportService, Clo
   /**
    * Constructs the transport service.
    *
+   * @param executorService           The executor service.
    * @param messagingExceptionHandler The messaging exception handler
    * @param sessionProvider           The Java mail session provider.
    */
   @Inject
-  public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler,
+  public JavaMailEmailTransportService(@Named("EmailExecutorService") ExecutorService executorService,
+                                       MessagingExceptionHandler messagingExceptionHandler,
                                        JavaMailSessionProvider sessionProvider) {
+    this.executorService = executorService;
     this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
 
-    // Please note:
-    //
-    //  When using a LinkedBlockingQueue with the ExecutorService, the corePoolSize needs to match the maximumPoolSize. In other words
-    //  it has to be a fixed size thread pool. By default, the LinkedBlockingQueue has an unbound capacity (Integer.MAX_VALUE), so it seems
-    //  that the ExecutorService will happily queue and never spin up workers past the corePoolSize. See ThreadPoolExecutor.execute for details.
-    //
-    //  Summary of ThreadPoolExecutor.execute:
-    //    1. If thread count is less than corePoolSize, add a new worker with the current command.
-    //    2. Else, queue command
-    //    3. Else, if queue failed, add a new worker thread.
-    //
-    //  So because we were using a LinkedBlockingQueue essentially unbound, as long as we could queue up events, we would not start any new threads.
-    //
-    //  For this reason, you either have to use a fixed thread pool, or use a SynchronousQueue which is essentially queue w/out capacity - a pipe.
-    //
-
-    // Create a fixed thread pool with an unbound blocking queue. This means we will always have 5 threads waiting to work, and
-    // we will allow new requests to be queued using an unbound queue.
-    executor = Executors.newFixedThreadPool(5,
-        r -> {
-          Thread t = new Thread(r, "Prime-Email Executor Thread");
-          t.setDaemon(true);
-          return t;
-        });
   }
 
   @Override
   public void close() {
-    executor.shutdownNow();
-  }
-
-  /**
-   * This is intended to allow you to collect metrics on this executor. Careful with this one. With great power...
-   *
-   * @return the thread pool executor in use by the Email Transport service.
-   */
-  public ThreadPoolExecutor getExecutor() {
-    return (ThreadPoolExecutor) executor;
+    executorService.shutdownNow();
   }
 
   /**
@@ -143,7 +110,7 @@ public class JavaMailEmailTransportService implements EmailTransportService, Clo
     EmailRunnable runnable = new EmailRunnable(contextId, message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
-        sendResult.future = executor.submit(runnable, sendResult);
+        sendResult.future = executorService.submit(runnable, sendResult);
       } catch (RejectedExecutionException ree) {
         sendResult.transportError = "Unable to submit the JavaMail message to the asynchronous handler " +
             "so that it can be processed at a later time. The email was therefore not sent.";

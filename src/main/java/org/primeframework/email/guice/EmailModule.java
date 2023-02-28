@@ -15,11 +15,16 @@
  */
 package org.primeframework.email.guice;
 
+import java.util.concurrent.ExecutorService;
+
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
+import com.google.inject.name.Names;
 import org.primeframework.email.config.DefaultEmailConfiguration;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.service.DefaultEmailService;
 import org.primeframework.email.service.DefaultMessagingExceptionHandler;
+import org.primeframework.email.service.EmailExecutorServiceProvider;
 import org.primeframework.email.service.EmailRenderer;
 import org.primeframework.email.service.EmailService;
 import org.primeframework.email.service.EmailTemplateLoader;
@@ -27,7 +32,6 @@ import org.primeframework.email.service.EmailTransportService;
 import org.primeframework.email.service.FreeMarkerEmailRenderer;
 import org.primeframework.email.service.JavaMailEmailTransportService;
 import org.primeframework.email.service.MessagingExceptionHandler;
-import static com.google.inject.Scopes.SINGLETON;
 
 /**
  * Binds all the services and configuration objects for emailing.
@@ -57,8 +61,10 @@ public abstract class EmailModule extends AbstractModule {
     bind(EmailConfiguration.class).to(DefaultEmailConfiguration.class);
     bind(EmailService.class).to(DefaultEmailService.class);
     bind(EmailRenderer.class).to(FreeMarkerEmailRenderer.class);
-    // Lazy singleton
-    bind(EmailTransportService.class).to(JavaMailEmailTransportService.class).in(SINGLETON);
+    bind(EmailTransportService.class).to(JavaMailEmailTransportService.class);
+
+    // Bind a singleton provider
+    bind(ExecutorService.class).annotatedWith(Names.named("EmailExecutorService")).toProvider(EmailExecutorServiceProvider.class).in(Scopes.SINGLETON);
 
     bindSessionProvider();
     bindTemplateLoader();

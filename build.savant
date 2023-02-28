@@ -42,6 +42,7 @@ project(group: "org.primeframework", name: "prime-email", version: "0.20.0", lic
       dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
       dependency(id: "com.sun.activation:jakarta.activation:${jakartaVersion}")
       dependency(id: "jakarta.mail:jakarta.mail-api:${jakartaVersion}")
+      dependency(id: "javax.inject:javax.inject:1")
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
       dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}")
     }
