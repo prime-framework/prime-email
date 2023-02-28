@@ -15,7 +15,6 @@
  */
 package org.primeframework.email.service;
 
-import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -51,7 +50,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Brian Pontarelli
  */
-public class JavaMailEmailTransportService implements EmailTransportService, Closeable {
+public class JavaMailEmailTransportService implements EmailTransportService {
   private final ExecutorService executorService;
 
   private final MessagingExceptionHandler messagingExceptionHandler;
@@ -73,11 +72,6 @@ public class JavaMailEmailTransportService implements EmailTransportService, Clo
     this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
 
-  }
-
-  @Override
-  public void close() {
-    executorService.shutdownNow();
   }
 
   /**
