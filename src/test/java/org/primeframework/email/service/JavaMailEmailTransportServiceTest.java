@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2023, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package org.primeframework.email.service;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
@@ -41,11 +39,9 @@ import static org.testng.Assert.assertTrue;
  */
 @Test(groups = "unit")
 public class JavaMailEmailTransportServiceTest {
-  private static Session session;
+  private static ExecutorService executorService;
 
-  @Inject
-  @Named("EmailExecutorService")
-  public ExecutorService executorService;
+  private static Session session;
 
   @BeforeClass
   public static void setup() {
@@ -82,6 +78,7 @@ public class JavaMailEmailTransportServiceTest {
       };
     }
 
+    executorService = new EmailExecutorServiceProvider().get();
     session = Session.getInstance(props, auth);
   }
 
