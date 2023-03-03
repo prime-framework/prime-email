@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2012-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,16 @@
  */
 package org.primeframework.email.guice;
 
+import java.util.concurrent.ExecutorService;
+
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
+import com.google.inject.name.Names;
 import org.primeframework.email.config.DefaultEmailConfiguration;
 import org.primeframework.email.config.EmailConfiguration;
 import org.primeframework.email.service.DefaultEmailService;
 import org.primeframework.email.service.DefaultMessagingExceptionHandler;
+import org.primeframework.email.service.EmailExecutorServiceProvider;
 import org.primeframework.email.service.EmailRenderer;
 import org.primeframework.email.service.EmailService;
 import org.primeframework.email.service.EmailTemplateLoader;
@@ -35,6 +40,13 @@ import org.primeframework.email.service.MessagingExceptionHandler;
  */
 public abstract class EmailModule extends AbstractModule {
   /**
+   * Implement this method to bind the {@link org.primeframework.email.service.MessagingExceptionHandler} interface.
+   */
+  protected void bindMessagingExceptionHandler() {
+    bind(MessagingExceptionHandler.class).to(DefaultMessagingExceptionHandler.class);
+  }
+
+  /**
    * Implement this method to bind a JavaMail Session Provider (or the session directly if you want).
    */
   protected abstract void bindSessionProvider();
@@ -44,19 +56,15 @@ public abstract class EmailModule extends AbstractModule {
    */
   protected abstract void bindTemplateLoader();
 
-  /**
-   * Implement this method to bind the {@link org.primeframework.email.service.MessagingExceptionHandler} interface.
-   */
-  protected void bindMessagingExceptionHandler() {
-    bind(MessagingExceptionHandler.class).to(DefaultMessagingExceptionHandler.class);
-  }
-
   @Override
   protected void configure() {
     bind(EmailConfiguration.class).to(DefaultEmailConfiguration.class);
     bind(EmailService.class).to(DefaultEmailService.class);
-    bind(EmailTransportService.class).to(JavaMailEmailTransportService.class);
     bind(EmailRenderer.class).to(FreeMarkerEmailRenderer.class);
+    bind(EmailTransportService.class).to(JavaMailEmailTransportService.class);
+
+    // Bind a singleton provider
+    bind(ExecutorService.class).annotatedWith(Names.named("EmailExecutorService")).toProvider(EmailExecutorServiceProvider.class).in(Scopes.SINGLETON);
 
     bindSessionProvider();
     bindTemplateLoader();

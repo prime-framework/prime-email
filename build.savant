@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019, Inversoft Inc., All Rights Reserved
+ * Copyright (c) 2014-2023, Inversoft Inc., All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * language governing permissions and limitations under the License.
  */
 
-freemarkerVersion = "2.3.28"
+freemarkerVersion = "2.3.30"
 guavaVersion = "30.1.0-jre"
-guiceVersion = "5.0.1"
+guiceVersion = "5.1.0"
 jakartaVersion = "2.0.1"
-savantVersion = "1.0.0"
-slf4jVersion = "2.0.0-alpha5"
-testngVersion = "7.3.0"
+slf4jVersion = "2.0.3"
+testngVersion ="7.3.0"
 
-project(group: "org.primeframework", name: "prime-email", version: "0.19.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-email", version: "0.20.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
-      url(url: "https://external.savant.fusionauth.io")
+      url(url: "https://repository.savantbuild.org")
     }
     publish {
       cache()
@@ -34,7 +33,7 @@ project(group: "org.primeframework", name: "prime-email", version: "0.19.0", lic
   }
 
   publishWorkflow {
-    subversion(repository: "https://external.svn.fusionauth.io")
+    subversion(repository: "https://svn.savantbuild.org")
   }
 
   dependencies {
@@ -43,6 +42,7 @@ project(group: "org.primeframework", name: "prime-email", version: "0.19.0", lic
       dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
       dependency(id: "com.sun.activation:jakarta.activation:${jakartaVersion}")
       dependency(id: "jakarta.mail:jakarta.mail-api:${jakartaVersion}")
+      dependency(id: "javax.inject:javax.inject:1")
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
       dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}")
     }
@@ -60,11 +60,11 @@ project(group: "org.primeframework", name: "prime-email", version: "0.19.0", lic
 }
 
 // Plugins
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:1.0.2")
-java = loadPlugin(id: "org.savantbuild.plugin:java:1.0.2")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:1.0.9")
-idea = loadPlugin(id: "org.savantbuild.plugin:idea:${savantVersion}")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:2.0.0-RC.2")
+java = loadPlugin(id: "org.savantbuild.plugin:java:2.0.0-RC.2")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:2.0.0-RC.2")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:2.0.0-RC.2")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:2.0.0-RC.2")
 
 // Plugin settings
 java.settings.javaVersion = "1.8"

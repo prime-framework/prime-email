@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2019, JCatapult.org, All Rights Reserved
+ * Copyright (c) 2001-2023, JCatapult.org, All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,10 @@ package org.primeframework.email.service;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.BodyPart;
@@ -53,33 +51,27 @@ import org.slf4j.LoggerFactory;
  * @author Brian Pontarelli
  */
 public class JavaMailEmailTransportService implements EmailTransportService {
-  private static final ExecutorService ExecutorService;
+  private final ExecutorService executorService;
 
   private final MessagingExceptionHandler messagingExceptionHandler;
 
   private final JavaMailSessionProvider sessionProvider;
 
-  static {
-    // Create a bound thread executor pool of 1 to 5 threads with a keep alive for idle threads of 60 seconds.
-    ExecutorService = new ThreadPoolExecutor(1, 5, 60L, TimeUnit.SECONDS,
-        new LinkedBlockingQueue<>(),
-        (r) -> {
-          Thread t = new Thread(r, "Prime-Email Executor Thread");
-          t.setDaemon(true);
-          return t;
-        });
-  }
-
   /**
    * Constructs the transport service.
    *
-   * @param sessionProvider The Java mail session provider.
+   * @param executorService           The executor service.
+   * @param messagingExceptionHandler The messaging exception handler
+   * @param sessionProvider           The Java mail session provider.
    */
   @Inject
-  public JavaMailEmailTransportService(MessagingExceptionHandler messagingExceptionHandler,
+  public JavaMailEmailTransportService(@Named("EmailExecutorService") ExecutorService executorService,
+                                       MessagingExceptionHandler messagingExceptionHandler,
                                        JavaMailSessionProvider sessionProvider) {
+    this.executorService = executorService;
     this.messagingExceptionHandler = messagingExceptionHandler;
     this.sessionProvider = sessionProvider;
+
   }
 
   /**
@@ -112,7 +104,7 @@ public class JavaMailEmailTransportService implements EmailTransportService {
     EmailRunnable runnable = new EmailRunnable(contextId, message(email, sendResult, session), sendResult, messagingExceptionHandler);
     if (sendResult.wasSuccessful()) {
       try {
-        sendResult.future = ExecutorService.submit(runnable, sendResult);
+        sendResult.future = executorService.submit(runnable, sendResult);
       } catch (RejectedExecutionException ree) {
         sendResult.transportError = "Unable to submit the JavaMail message to the asynchronous handler " +
             "so that it can be processed at a later time. The email was therefore not sent.";
