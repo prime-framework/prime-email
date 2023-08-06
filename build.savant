@@ -14,18 +14,22 @@
  * language governing permissions and limitations under the License.
  */
 
-freemarkerVersion = "2.3.30"
-guavaVersion = "30.1.0-jre"
-guiceVersion = "5.1.0"
-jakartaVersion = "2.0.1"
-slf4jVersion = "2.0.3"
+freemarkerVersion = "2.3.32"
+guavaVersion = "32.1.2-jre"
+guiceVersion = "6.0.0"
+jakartaActivationVersion = "2.1.2"
+jakartaInjectVersion = "2.0.1"
+jakartaMailAPIVersion = "2.1.2"
+jakartaMailVersion = "2.0.2"
+slf4jVersion = "2.0.7"
 testngVersion ="7.3.0"
 
-project(group: "org.primeframework", name: "prime-email", version: "0.20.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-email", version: "0.21.0", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
       url(url: "https://repository.savantbuild.org")
+      maven()
     }
     publish {
       cache()
@@ -40,17 +44,21 @@ project(group: "org.primeframework", name: "prime-email", version: "0.20.0", lic
     group(name: "compile") {
       dependency(id: "com.google.inject:guice:${guiceVersion}")
       dependency(id: "com.google.guava:guava:${guavaVersion}", skipCompatibilityCheck: true)
-      dependency(id: "com.sun.activation:jakarta.activation:${jakartaVersion}")
-      dependency(id: "jakarta.mail:jakarta.mail-api:${jakartaVersion}")
+      dependency(id: "jakarta.activation:jakarta.activation-api:${jakartaActivationVersion}")
+      dependency(id: "jakarta.inject:jakarta.inject-api:${jakartaInjectVersion}", skipCompatibilityCheck: true)
+      dependency(id: "jakarta.mail:jakarta.mail-api:${jakartaMailAPIVersion}")
       dependency(id: "javax.inject:javax.inject:1")
       dependency(id: "org.freemarker:freemarker:${freemarkerVersion}")
-      dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}")
+      dependency(id: "org.slf4j:slf4j-api:${slf4jVersion}", skipCompatibilityCheck: true)
+    }
+    group(name: "runtime") {
+      // https://eclipse-ee4j.github.io/angus-mail/
+      // - Include the base jar (core) and SMTP
+      dependency(id: "org.eclipse.angus:angus-core:${jakartaMailVersion}")
+      dependency(id: "org.eclipse.angus:smtp:${jakartaMailVersion}")
     }
     group(name: "test-compile", export: false) {
       dependency(id: "org.testng:testng:${testngVersion}")
-    }
-    group(name: "test-runtime", export: false) {
-      dependency(id: "com.sun.mail:jakarta.mail:${jakartaVersion}")
     }
   }
 
@@ -60,11 +68,11 @@ project(group: "org.primeframework", name: "prime-email", version: "0.20.0", lic
 }
 
 // Plugins
-dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:2.0.0-RC.2")
-java = loadPlugin(id: "org.savantbuild.plugin:java:2.0.0-RC.2")
-javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:2.0.0-RC.2")
-idea = loadPlugin(id: "org.savantbuild.plugin:idea:2.0.0-RC.2")
-release = loadPlugin(id: "org.savantbuild.plugin:release-git:2.0.0-RC.2")
+dependency = loadPlugin(id: "org.savantbuild.plugin:dependency:2.0.0-RC.6")
+java = loadPlugin(id: "org.savantbuild.plugin:java:2.0.0-RC.6")
+javaTestNG = loadPlugin(id: "org.savantbuild.plugin:java-testng:2.0.0-RC.6")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:2.0.0-RC.7")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:2.0.0-RC.6")
 
 // Plugin settings
 java.settings.javaVersion = "1.8"
