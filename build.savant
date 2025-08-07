@@ -20,7 +20,7 @@ guiceVersion = "6.0.0"
 jakartaActivationVersion = "2.1.2"
 jakartaInjectVersion = "2.0.1"
 jakartaMailAPIVersion = "2.1.2"
-jakartaMailVersion = "2.0.2"
+jakartaMailVersion = "2.0.4"
 slf4jVersion = "2.0.7"
 testngVersion ="7.3.0"
 
