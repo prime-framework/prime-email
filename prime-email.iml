@@ -94,6 +94,17 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$MODULE_DIR$/.savant/cache/com/google/guava/guava/32.1.2-jre/guava-32.1.2-jre.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -130,17 +141,8 @@
           <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/4.2.2/guice-no_aop-4.2.2.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/.savant/cache/javax/inject/javax.inject/1.0.0/javax.inject-1.0.0-src.jar!/" />
+          <root url="jar://$MODULE_DIR$/.savant/cache/com/google/inject/guice/4.2.2/guice-no_aop-4.2.2-src.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
