@@ -24,7 +24,7 @@ jakartaMailVersion = "2.0.4"
 slf4jVersion = "2.0.7"
 testngVersion ="7.3.0"
 
-project(group: "org.primeframework", name: "prime-email", version: "0.21.0", licenses: ["ApacheV2_0"]) {
+project(group: "org.primeframework", name: "prime-email", version: "0.21.1", licenses: ["ApacheV2_0"]) {
   workflow {
     fetch {
       cache()
