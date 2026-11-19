@@ -1,0 +1,24 @@
+[versions]
+angus = "2.0.4"
+freemarker = "2.3.32"
+guava = "32.1.2-jre"
+guice = "6.0.0"
+jakarta-activation = "2.1.3"
+jakarta-inject = "2.0.1"
+jakarta-mail-api = "2.1.3"
+javax-inject = "1"
+slf4j = "2.0.17"
+testng = "7.10.2"
+
+[libraries]
+angus-core = { module = "org.eclipse.angus:angus-core", version.ref = "angus" }
+angus-smtp = { module = "org.eclipse.angus:smtp", version.ref = "angus" }
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+guice = { module = "com.google.inject:guice", version.ref = "guice" }
+jakarta-activation-api = { module = "jakarta.activation:jakarta.activation-api", version.ref = "jakarta-activation" }
+jakarta-inject-api = { module = "jakarta.inject:jakarta.inject-api", version.ref = "jakarta-inject" }
+jakarta-mail-api = { module = "jakarta.mail:jakarta.mail-api", version.ref = "jakarta-mail-api" }
+javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax-inject" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+testng = { module = "org.testng:testng", version.ref = "testng" }
